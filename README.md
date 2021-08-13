@@ -1,2 +1,2 @@
-# file-service
+# tgs-file-service
 
