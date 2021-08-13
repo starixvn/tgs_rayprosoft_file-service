@@ -4,6 +4,7 @@ pipeline {
     agent any
  
  environment {
+        TAG = sh(script: "echo `date +%Y-%m%d-%H%M`", returnStdout: true).trim()
         Registry = "registry.gitlab.com/rayprosoft/turnkey-gaming-system/"
         BuildConfiguration='Debug'
  }
