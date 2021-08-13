@@ -2,11 +2,11 @@ def deployedComponents = ""
 
 pipeline {
     agent any
-	
-	environment {
+ 
+ environment {
         Registry = "registry.gitlab.com/rayprosoft/turnkey-gaming-system/"
         BuildConfiguration='Debug'
-	}
+ }
 
     stages {
         stage('Prepare') {
@@ -33,19 +33,19 @@ pipeline {
                 }
 
                 configFileProvider([
-					configFile(
-						fileId: 'tgs.' + env.kube_ns , 
-						variable: 'tgsconfig')]) {
-					script {
-						def envItems = readProperties file: "$tgsconfig";
+     configFile(
+      fileId: 'tgs.' + env.kube_ns , 
+      variable: 'tgsconfig')]) {
+     script {
+      def envItems = readProperties file: "$tgsconfig";
 
                         envItems.each { key, value -> 
                             env."tgs_${key}" = value;
                         }
 
                         env.TAG = env.kube_ns + '-' + sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim()
-					}
-				}
+     }
+    }
 
                 sh "echo tag: $TAG"
             }
@@ -57,10 +57,10 @@ pipeline {
         }
 
         stage('Test') {
-			steps {
-				sh  "dotnet test -c $BuildConfiguration --filter Unit /p:CollectCoverage=true --logger trx --no-build"
-			}
-		}
+   steps {
+    sh  "dotnet test -c $BuildConfiguration --filter Unit /p:CollectCoverage=true --logger trx --no-build"
+   }
+  }
 
         stage('Building file-service image') {
             when {
@@ -71,10 +71,10 @@ pipeline {
             environment {
                 ImageName="${Registry}file-service"
             }
-			steps {
+   steps {
                 sh 'dotnet build "src/Apis/FileService" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
                 sh 'docker push $ImageName:${TAG}'
-			}
+   }
         }
 
         stage('Deploy file-service') {
@@ -125,9 +125,9 @@ pipeline {
                 }
             }
         }
-	}
-	
-	 post {
+ }
+ 
+  post {
         success {
              sendTelegram("Pipeline: ${currentBuild.fullDisplayName} OK!\nDeployed Components: ${deployedComponents} \n${currentBuild.getBuildCauses()[0].shortDescription}\n")
         }
@@ -135,8 +135,8 @@ pipeline {
             sendTelegram("<b>Failed Pipeline:</b> ${currentBuild.fullDisplayName} \n Deploy Components: ${deployedComponents} \n Something is wrong with ${env.BUILD_URL}/console\n${currentBuild.getBuildCauses()[0].shortDescription}\n")
         }
         always {
-			step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: false, keepLongStdio: true])
-		}
+   step([$class: 'MSTestPublisher', testResultsFile:"**/*.trx", failOnError: false, keepLongStdio: true])
+  }
     }
 }
 
