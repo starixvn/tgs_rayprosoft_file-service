@@ -63,6 +63,13 @@ pipeline {
 			}
 		}
 
+        stage('Push packages') {
+            steps {
+                sh 'dotnet pack -c $BuildConfiguration "FileService.Client/FileService.Client.csproj" --no-build'
+                sh 'dotnet nuget push "FileService.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
+            }
+        }
+
         stage('Building file-service image') {
             when {
                 expression {
