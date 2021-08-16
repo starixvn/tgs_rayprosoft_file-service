@@ -5,14 +5,13 @@ pipeline {
 	
 	environment {
         TAG = sh(script: "echo `date +%Y-%m%d-%H%M`", returnStdout: true).trim()
-        Registry = "registry.gitlab.com/rayprosoft/turnkey-gaming-system/"
+        ImageName = "registry.gitlab.com/rayprosoft/turnkey-gaming-system/file-service"
         BuildConfiguration='Debug'
 	}
 
     stages {
         stage('Prepare') {
             steps {
-                sh "echo 'Process components: $Components'";
                 sh "echo 'Branch: $GIT_BRANCH'";
 
                 script {
@@ -71,29 +70,13 @@ pipeline {
         }
 
         stage('Building file-service image') {
-            when {
-                expression {
-                    return checkIsRunStage("file-service", params['Components'])
-                }
-            }
-            environment {
-                ImageName="${Registry}file-service"
-            }
 			steps {
-                sh 'dotnet build "src/Apis/FileService" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
+                sh 'dotnet build "FileService" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
                 sh 'docker push $ImageName:${TAG}'
 			}
         }
 
         stage('Deploy file-service') {
-            when {
-                expression {
-                    return checkIsRunStage("file-service", params['Components'])
-                }
-            }
-            environment {
-                ImageName="${Registry}file-service"
-            }
             steps {
                 withKubeConfig([credentialsId: env.k8s_config]) {
                     sh '''
