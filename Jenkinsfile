@@ -83,39 +83,39 @@ pipeline {
       steps {
         withKubeConfig([credentialsId: env.k8s_config]) {
           sh '''
-          helm template deployment / k8s / file - service\
-            --set image.tag = $ {TAG}\
-            --set namespace = $ {kube_ns}\
-            --set connectionStrings.mongo = "$tgs_mongo"\
-            --set nats.urls = "$tgs_nats"\
-            --set aws.accessKey = "$tgs_aws_access_key"\
-            --set aws.Secret = "$tgs_aws_access_secret"\
-            --set aws.region = "$tgs_aws_region"\
-            --set aws.public.externalUrl = "$tgs_file_public_external"\
-            --set aws.public.serviceUrl = "$file_public_service"\
-            --set aws.public.bucket = "$tgs_file_public_bucket"\
-            --set aws.private.externalUrl = "$tgs_file_private_external"\
-            --set aws.private.serviceUrl = "$tgs_file_private_service"\
-            --set aws.private.bucket = "$tgs_file_private_bucket"\
-            --set aspNetCoreEnvironment = "$tgs_aspNetCoreEnvironment"
+            helm template deployment/k8s/file-service \
+              --set image.tag = ${TAG} \
+              --set namespace = ${kube_ns} \
+              --set connectionStrings.mongo = "$tgs_mongo" \
+              --set nats.urls = "$tgs_nats" \
+              --set aws.accessKey = "$tgs_aws_access_key" \
+              --set aws.Secret = "$tgs_aws_access_secret" \
+              --set aws.region = "$tgs_aws_region" \
+              --set aws.public.externalUrl = "$tgs_file_public_external" \
+              --set aws.public.serviceUrl = "$file_public_service" \
+              --set aws.public.bucket = "$tgs_file_public_bucket" \
+              --set aws.private.externalUrl = "$tgs_file_private_external" \
+              --set aws.private.serviceUrl = "$tgs_file_private_service" \
+              --set aws.private.bucket = "$tgs_file_private_bucket" \
+              --set aspNetCoreEnvironment = "$tgs_aspNetCoreEnvironment"
 
-          helm template deployment / k8s / file - service\
-            --set image.tag = $ {TAG}\
-            --set namespace = $ {kube_ns}\
-            --set connectionStrings.mongo = "$tgs_mongo"\
-            --set nats.urls = "$tgs_nats"\
-            --set aws.accessKey = "$tgs_aws_access_key"\
-            --set aws.Secret = "$tgs_aws_access_secret"\
-            --set aws.region = "$tgs_aws_region"\
-            --set aws.public.externalUrl = "$tgs_file_public_external"\
-            --set aws.public.serviceUrl = "$file_public_service"\
-            --set aws.public.bucket = "$tgs_file_public_bucket"\
-            --set aws.private.externalUrl = "$tgs_file_private_external"\
-            --set aws.private.serviceUrl = "$tgs_file_private_service"\
-            --set aws.private.bucket = "$tgs_file_private_bucket"\
-            --set aspNetCoreEnvironment = "$tgs_aspNetCoreEnvironment"\ 
-            | kubectl - n $ { kube_ns } apply - f -
-            '''
+            helm template deployment/k8s/file-service \
+              --set image.tag = ${TAG} \
+              --set namespace = ${kube_ns} \
+              --set connectionStrings.mongo = "$tgs_mongo" \
+              --set nats.urls = "$tgs_nats" \
+              --set aws.accessKey = "$tgs_aws_access_key" \
+              --set aws.Secret = "$tgs_aws_access_secret" \
+              --set aws.region = "$tgs_aws_region" \
+              --set aws.public.externalUrl = "$tgs_file_public_external" \
+              --set aws.public.serviceUrl = "$file_public_service" \
+              --set aws.public.bucket = "$tgs_file_public_bucket" \
+              --set aws.private.externalUrl = "$tgs_file_private_external" \
+              --set aws.private.serviceUrl = "$tgs_file_private_service" \
+              --set aws.private.bucket = "$tgs_file_private_bucket" \
+              --set aspNetCoreEnvironment = "$tgs_aspNetCoreEnvironment" \ 
+            | kubectl -n ${kube_ns} apply -f -
+          '''
         }
       }
     }
