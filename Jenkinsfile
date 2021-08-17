@@ -72,8 +72,8 @@ pipeline {
 
     stage('Building file-service image') {
       steps {
-        sh 'dotnet build "FileService" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
-        sh 'docker push $ImageName:${TAG}'
+        sh 'dotnet build "FileService" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:$TAG" --no-restore '
+        sh 'docker push $ImageName:$TAG'
       }
     }
 
@@ -82,7 +82,7 @@ pipeline {
         withKubeConfig([credentialsId: env.k8s_config]) {
           sh '''
             helm template deployment/k8s/file-service \
-                --set image.tag=${TAG} \
+                --set image.tag=$TAG \
                 --set namespace=${kube_ns} \
                 --set connectionStrings.mongo="$tgs_mongo" \
                 --set nats.urls="$tgs_nats" \
@@ -98,7 +98,7 @@ pipeline {
                 --set aspNetCoreEnvironment="$tgs_aspNetCoreEnvironment"
 
               helm template deployment/k8s/file-service \
-                  --set image.tag=${TAG} \
+                  --set image.tag=$TAG \
                   --set namespace=${kube_ns} \
                   --set connectionStrings.mongo="$tgs_mongo" \
                   --set nats.urls="$tgs_nats" \
