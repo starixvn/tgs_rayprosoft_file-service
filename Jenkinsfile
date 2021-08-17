@@ -92,7 +92,7 @@ pipeline {
               --set aws.secretAccessKey="$tgs_aws_access_secret" \
               --set aws.region="$tgs_aws_region" \
               --set aws.public.externalUrl="$tgs_file_public_external" \
-              --set aws.public.serviceUrl="$file_public_service" \
+              --set aws.public.serviceUrl="$tgs_file_public_service" \
               --set aws.public.bucket="$tgs_file_public_bucket" \
               --set aws.private.externalUrl="$tgs_file_private_external" \
               --set aws.private.serviceUrl="$tgs_file_private_service" \
@@ -107,7 +107,7 @@ pipeline {
               --set aws.secretAccessKey="$tgs_aws_access_secret" \
               --set aws.region="$tgs_aws_region" \
               --set aws.public.externalUrl="$tgs_file_public_external" \
-              --set aws.public.serviceUrl="$file_public_service" \
+              --set aws.public.serviceUrl="$tgs_file_public_service" \
               --set aws.public.bucket="$tgs_file_public_bucket" \
               --set aws.private.externalUrl="$tgs_file_private_external" \
               --set aws.private.serviceUrl="$tgs_file_private_service" \
