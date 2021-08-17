@@ -1,4 +1,4 @@
-﻿namespace TGS.Apis.FileService.Clients
+﻿namespace Tgs.FileService.Clients
 {
     public record UpdateFilesRequest(string[] FileNames);
 }

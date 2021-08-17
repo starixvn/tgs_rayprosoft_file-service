@@ -8,7 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using TGS.Core.Infrastructures.Json;
 
-namespace TGS.Apis.FileService.Clients
+namespace Tgs.FileService.Clients
 {
     internal class FileServiceClient : IFileServiceClient
     {
