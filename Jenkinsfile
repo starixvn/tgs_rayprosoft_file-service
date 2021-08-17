@@ -44,7 +44,7 @@ pipeline {
               value -> env."tgs_${key}" = value;
             }
 
-            env.TAG = env.kube_ns + '-' + sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim()
+            TAG = env.kube_ns + '-' + sh(script: "echo `date +%Y%m%d%H%M`", returnStdout: true).trim()
           }
         }
 
