@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Net.Http;
-using Microsoft.Extensions.DependencyInjection;
+using Tgs.FileService.Clients;
 
-namespace Tgs.FileService.Clients.Microsoft.Extensions.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
