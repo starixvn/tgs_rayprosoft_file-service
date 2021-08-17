@@ -2,19 +2,19 @@
 {
     public class AwsOptions
     {
-        public string AccessKeyId { get; init; }
-        public string SecretAccessKey { get; init; }
-        public string Region { get; init; }
-        public string ServiceUrl { get; init; }
-        public bool UseHttp { get; init; }
-        public S3 Public { get; init; }
-        public S3 Private { get; init; }
+        public string AccessKeyId { get; set; }
+        public string SecretAccessKey { get; set; }
+        public string Region { get; set; }
+        public string ServiceUrl { get; set; }
+        public bool UseHttp { get; set; }
+        public S3 Public { get; set; }
+        public S3 Private { get; set; }
     }
 
-    public record S3
+    public class S3
     {
-        public string ExternalServiceUrl { get; init; }
-        public string ServiceUrl { get; init; }
-        public string Bucket { get; init; }
+        public string ExternalServiceUrl { get; set; }
+        public string ServiceUrl { get; set; }
+        public string Bucket { get; set; }
     }
 }

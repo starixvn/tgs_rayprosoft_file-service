@@ -1,36 +1,22 @@
 ﻿using System;
 using FileService.Core;
 using FileService.Core.Configuration;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static FileServiceConfiguration AddFileServiceCore(this IServiceCollection services,
-            Action<AwsOptions, IServiceProvider> configure = null)
+        public static FileServiceConfiguration AddFileServiceCore(
+            this IServiceCollection services,
+            Action<AwsOptions, IServiceProvider> configure)
         {
             services.AddTransient(typeof(IFileManager<>), typeof(FileManager<>));
-
-            if (configure != null)
-            {
-                services.AddOptions<AwsOptions>().Configure(configure);
-            }
-
-            var configuration = new FileServiceConfiguration(services);
-
-            return configuration;
-        }
-
-        public static IServiceCollection AddAws(this IServiceCollection services,
-            IConfiguration configuration, string configSectionName = "AWS")
-        {
-            services.Configure<AwsOptions>(x => configuration.GetSection(configSectionName));
-            //services.AddSingleton(sp => sp.GetRequiredService<IOptions<AwsOptions>>().Value);
+            services.AddOptions<AwsOptions>().Configure(configure);
 
             services.AddSingleton<IPublicAmazonS3>(sp =>
             {
-                var settings = sp.GetRequiredService<AwsOptions>();
+                var settings = sp.GetRequiredService<IOptions<AwsOptions>>().Value;
                 if (settings == null)
                 {
                     throw new ArgumentException("can't get aws settings");
@@ -47,7 +33,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddSingleton<IPrivateAmazonS3>(sp =>
             {
-                var settings = sp.GetRequiredService<AwsOptions>();
+                var settings = sp.GetRequiredService<IOptions<AwsOptions>>().Value;
                 if (settings == null)
                 {
                     throw new ArgumentException("can't get aws settings");
@@ -62,7 +48,9 @@ namespace Microsoft.Extensions.DependencyInjection
                     });
             });
 
-            return services;
+            var configuration = new FileServiceConfiguration(services);
+
+            return configuration;
         }
     }
 }

@@ -5,7 +5,7 @@
     <RootNamespace>TGS.Apis.FileService.Clients</RootNamespace>
     <AssemblyName>FileService.Client</AssemblyName>
     <PackageId>TGS.FileService.Client</PackageId>
-    <Version>0.0.1-alpha</Version>
+    <Version>0.0.1</Version>
     <Authors>Raypro</Authors>
     <Product>TGS.FileService.Client</Product>
     <Description>FileService Client</Description>

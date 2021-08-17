@@ -46,7 +46,8 @@ namespace FileService.Core
 
             var request = new DeleteObjectsRequest
             {
-                BucketName = _bucket, Objects = files.Select(file => new KeyVersion {Key = file.FileName}).ToList()
+                BucketName = _bucket,
+                Objects = files.Select(file => new KeyVersion {Key = file.FileName}).ToList()
             };
 
             await _amazonS3.DeleteObjectsAsync(request).ConfigureAwait(false);
@@ -79,7 +80,12 @@ namespace FileService.Core
         {
             var savePath = filePath.TrimStart('/');
 
-            var request = new PutObjectRequest {BucketName = _bucket, Key = savePath, InputStream = fileStream};
+            var request = new PutObjectRequest
+            {
+                BucketName = _bucket,
+                Key = savePath,
+                InputStream = fileStream
+            };
 
             var response = await _amazonS3.PutObjectAsync(request);
 

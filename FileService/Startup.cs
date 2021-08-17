@@ -52,13 +52,17 @@ namespace FileService
                     {
                         var config = sp.GetRequiredService<IConfiguration>();
 
-                        options.Url = config.GetConnectionString("Nats");
+                        options.Url = config.GetValue<string>("DatabaseSettings:Nats");
                     });
                 })
-                .AddFile(_configuration)
-                .AddAws(_configuration);
+                .AddFile(_configuration);
 
-            services.AddFileServiceCore()
+            services.AddFileServiceCore((options, sp) =>
+                {
+                    var config = sp.GetRequiredService<IConfiguration>();
+
+                    config.GetSection("AWS").Bind(options);
+                })
                 .UseMongoRepository((options, sp) =>
                 {
                     var config = sp.GetRequiredService<IConfiguration>();
@@ -84,7 +88,11 @@ namespace FileService
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new() {Title = "TGS FileService API", Version = "v1"});
+                c.SwaggerDoc("v1", new()
+                {
+                    Title = "TGS FileService API",
+                    Version = "v1"
+                });
 
                 var xml = "TGS.Apis.FileService.xml";
                 var path = Path.Combine(AppContext.BaseDirectory, xml);
