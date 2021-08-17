@@ -37,25 +37,22 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
-          env:
-            - name: aspnetcore_environment
-              value: "{{ .Values.aspNetCoreEnvironment}}"
-            - name: aspnetcore_https_port
-              value: "443"
           volumeMounts:
-            - mountPath: /app/appsettings.json
+            - mountPath: /config/appsettings.json
               name: appsettings
               readOnly: true
               subPath: appsettings.json
           livenessProbe:
-            tcpSocket:
+            httpGet:
+              path: /fs/health
               port: 80
-            initialDelaySeconds: 30
+            initialDelaySeconds: 10
             periodSeconds: 5
           readinessProbe:
-            tcpSocket:
+            httpGet:
+              path: /fs/health
               port: 80
-            initialDelaySeconds: 30
+            initialDelaySeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
