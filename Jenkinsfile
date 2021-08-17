@@ -4,7 +4,6 @@ pipeline {
   agent any
 
   environment {
-    TAG = sh(script: "echo `date +%Y-%m%d-%H%M`", returnStdout: true).trim()
     ImageName = "registry.gitlab.com/rayprosoft/turnkey-gaming-system/file-service"
     BuildConfiguration = 'Debug'
   }
@@ -44,7 +43,7 @@ pipeline {
               value -> env."tgs_${key}" = value;
             }
 
-            TAG = env.kube_ns + '-' + TAG 
+            env.TAG = env.kube_ns + '-' + sh(script: "echo `date +%Y%-m%d-%H%M`", returnStdout: true).trim()
             message += "\nBranch: ${env.GIT_BRANCH}" 
             message += "\nTag: ${TAG}"
             message += "\nEnv: $env.kube_ns"
