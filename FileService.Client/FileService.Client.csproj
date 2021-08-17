@@ -1,8 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>TGS.Apis.FileService.Clients</RootNamespace>
+    <RootNamespace>Tgs.FileService.Clients</RootNamespace>
     <AssemblyName>FileService.Client</AssemblyName>
     <PackageId>TGS.FileService.Client</PackageId>
     <Version>0.0.1</Version>
