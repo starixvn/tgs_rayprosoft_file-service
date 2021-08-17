@@ -4,10 +4,10 @@
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Tgs.FileService.Clients</RootNamespace>
     <AssemblyName>FileService.Client</AssemblyName>
-    <PackageId>TGS.FileService.Client</PackageId>
-    <Version>0.0.2</Version>
+    <PackageId>Tgs.FileService.Client</PackageId>
+    <Version>0.0.3</Version>
     <Authors>Raypro</Authors>
-    <Product>TGS.FileService.Client</Product>
+    <Product>Tgs.FileService.Client</Product>
     <Description>FileService Client</Description>
     <PackageProjectUrl>https://gitlab.com/rayprosoft/file-service</PackageProjectUrl>
     <RepositoryUrl>https://gitlab.com/rayprosoft/file-service.git</RepositoryUrl>
