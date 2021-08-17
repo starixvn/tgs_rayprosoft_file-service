@@ -1,10 +1,9 @@
-def deployedComponents = ""
+def message  = ""
 
 pipeline {
   agent any
 
   environment {
-    TAG = sh(script: "echo `date +%Y-%m%d-%H%M`", returnStdout: true).trim()
     ImageName = "registry.gitlab.com/rayprosoft/turnkey-gaming-system/file-service"
     BuildConfiguration = 'Debug'
   }
@@ -44,7 +43,10 @@ pipeline {
               value -> env."tgs_${key}" = value;
             }
 
-            TAG = env.kube_ns + '-' + TAG 
+            env.TAG = env.kube_ns + '-' + sh(script: "echo `date +%Y%-m%d-%H%M`", returnStdout: true).trim()
+            message += "\nBranch: ${env.GIT_BRANCH}" 
+            message += "\nTag: ${TAG}"
+            message += "\nEnv: $env.kube_ns"
           }
         }
 
@@ -120,10 +122,10 @@ pipeline {
 
   post {
     success {
-      sendTelegram("Pipeline: ${currentBuild.fullDisplayName} OK!\nDeployed Components: ${deployedComponents} \n${currentBuild.getBuildCauses()[0].shortDescription}\n")
+      sendTelegram("Pipeline: ${currentBuild.fullDisplayName} OK!\nDeployed Components: ${message } \n${currentBuild.getBuildCauses()[0].shortDescription}\n")
     }
     failure {
-      sendTelegram("<b>Failed Pipeline:</b> ${currentBuild.fullDisplayName} \n Deploy Components: ${deployedComponents} \n Something is wrong with ${env.BUILD_URL}/console\n${currentBuild.getBuildCauses()[0].shortDescription}\n")
+      sendTelegram("<b>Failed Pipeline:</b> ${currentBuild.fullDisplayName} \n Deploy Components: ${message } \n Something is wrong with ${env.BUILD_URL}/console\n${currentBuild.getBuildCauses()[0].shortDescription}\n")
     }
     always {
       step([$class: 'MSTestPublisher', testResultsFile: "**/*.trx", failOnError: false, keepLongStdio: true])
