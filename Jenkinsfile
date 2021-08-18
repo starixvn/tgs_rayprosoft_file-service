@@ -86,7 +86,7 @@ pipeline {
             helm template deployment/k8s/file-service \
               --set image.tag=${TAG} \
               --set namespace=${kube_ns} \
-              --set connectionStrings.mongo="$tgs_mongo" \
+              --set connectionStrings.file="$tgs_mongo_file" \
               --set nats.urls="$tgs_nats" \
               --set aws.accessKeyId="$tgs_aws_access_key" \
               --set aws.secretAccessKey="$tgs_aws_access_secret" \
@@ -101,7 +101,7 @@ pipeline {
             helm template deployment/k8s/file-service \
               --set image.tag=${TAG} \
               --set namespace=${kube_ns} \
-              --set connectionStrings.mongo="$tgs_mongo" \
+              --set connectionStrings.file="$tgs_mongo_file" \
               --set nats.urls="$tgs_nats" \
               --set aws.accessKeyId="$tgs_aws_access_key" \
               --set aws.secretAccessKey="$tgs_aws_access_secret" \
