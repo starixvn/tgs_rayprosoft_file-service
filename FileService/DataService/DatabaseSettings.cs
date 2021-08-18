@@ -1,12 +1,7 @@
 ﻿namespace FileService.DataService
 {
-    public interface IDatabaseSettings
+    public record DatabaseSettings
     {
-        string ConnectionString { get; init; }
-    }
-
-    public record DatabaseSettings : IDatabaseSettings
-    {
-        public string ConnectionString { get; init; }
+        public string ConnectionString { get; set; }
     }
 }

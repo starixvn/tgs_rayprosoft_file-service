@@ -6,8 +6,8 @@ metadata:
 data:
   appsettings.json: |
     {
-      "DatabaseSettings": {
-        "ConnectionString": "{{ .Values.connectionStrings.mongo }}",
+      "ConnectionStrings": {
+        "File": "{{ .Values.connectionStrings.file }}",
         "Nats": "{{ .Values.nats.urls }}"
       },
       "AWS": {
