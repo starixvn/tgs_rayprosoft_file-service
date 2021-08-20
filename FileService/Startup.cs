@@ -96,9 +96,9 @@ namespace FileService
                 })
                 .UseMongoRepository((options, sp) =>
                 {
-                    var config = sp.GetRequiredService<IConfiguration>();
+                    var config = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
 
-                    options.MongoConnectionString = config.GetValue<string>("DatabaseSettings:ConnectionString");
+                    options.MongoConnectionString = config.ConnectionString;
                 });
 
             services.AddTransient<IMongoContext<StationLetterFile>, MongoContext<StationLetterFile>>();
