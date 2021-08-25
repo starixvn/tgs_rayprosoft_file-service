@@ -28,17 +28,48 @@ namespace FileService
             _configuration = configuration;
         }
 
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        {
+            app.UseMiddleware<ExceptionMiddleware>();
+
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseRouting();
+
+            app.UseHttpMetrics();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+                endpoints.MapHealthChecks("/fs/health");
+
+                endpoints.MapMetrics();
+            });
+
+            if (!env.IsProduction())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TGS FileService API"));
+            }
+        }
+
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<DatabaseSettings>(
-                _configuration.GetSection("DatabaseSettings"));
-
-            services.AddSingleton<IDatabaseSettings>(provider =>
-                provider.GetRequiredService<IOptions<DatabaseSettings>>().Value);
+            services
+                .AddSingleton(
+                    provider => provider.GetRequiredService<IOptions<DatabaseSettings>>().Value)
+                .AddOptions<DatabaseSettings>()
+                .Configure<IConfiguration>((settings, config) =>
+                {
+                    settings.ConnectionString = config.GetConnectionString("File");
+                });
 
             services.AddSingleton<IMongoClient>(sp =>
             {
-                var settings = sp.GetRequiredService<IDatabaseSettings>();
+                var settings = sp.GetRequiredService<DatabaseSettings>();
                 return new MongoClient(settings.ConnectionString);
             });
 
@@ -52,7 +83,7 @@ namespace FileService
                     {
                         var config = sp.GetRequiredService<IConfiguration>();
 
-                        options.Url = config.GetValue<string>("DatabaseSettings:Nats");
+                        options.Url = config.GetConnectionString("Nats");
                     });
                 })
                 .AddFile(_configuration);
@@ -65,9 +96,9 @@ namespace FileService
                 })
                 .UseMongoRepository((options, sp) =>
                 {
-                    var config = sp.GetRequiredService<IConfiguration>();
+                    var config = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
 
-                    options.MongoConnectionString = config.GetValue<string>("DatabaseSettings:ConnectionString");
+                    options.MongoConnectionString = config.ConnectionString;
                 });
 
             services.AddTransient<IMongoContext<StationLetterFile>, MongoContext<StationLetterFile>>();
@@ -101,34 +132,6 @@ namespace FileService
                     c.IncludeXmlComments(path);
                 }
             });
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            app.UseMiddleware<ExceptionMiddleware>();
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseRouting();
-
-            app.UseHttpMetrics();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-                endpoints.MapHealthChecks("/fs/health");
-
-                endpoints.MapMetrics();
-            });
-
-            if (!env.IsProduction())
-            {
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TGS FileService API"));
-            }
         }
     }
 }
