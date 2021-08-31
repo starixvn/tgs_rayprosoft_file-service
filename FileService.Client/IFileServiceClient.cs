@@ -2,7 +2,7 @@
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace TGS.Apis.FileService.Clients
+namespace Tgs.FileService.Clients
 {
     public interface IFileServiceClient
     {

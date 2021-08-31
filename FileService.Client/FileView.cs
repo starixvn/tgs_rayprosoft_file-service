@@ -2,7 +2,7 @@
 
 using System;
 
-namespace TGS.Apis.FileService.Clients
+namespace Tgs.FileService.Clients
 {
     public record FileView
     {

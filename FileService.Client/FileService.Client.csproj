@@ -1,13 +1,13 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>TGS.Apis.FileService.Clients</RootNamespace>
+    <RootNamespace>Tgs.FileService.Clients</RootNamespace>
     <AssemblyName>FileService.Client</AssemblyName>
-    <PackageId>TGS.FileServiceClient</PackageId>
-    <Version>0.0.1-alpha</Version>
+    <PackageId>Tgs.FileService.Client</PackageId>
+    <Version>0.0.4</Version>
     <Authors>Raypro</Authors>
-    <Product>TGS.FileServiceClient</Product>
+    <Product>Tgs.FileService.Client</Product>
     <Description>FileService Client</Description>
     <PackageProjectUrl>https://gitlab.com/rayprosoft/file-service</PackageProjectUrl>
     <RepositoryUrl>https://gitlab.com/rayprosoft/file-service.git</RepositoryUrl>

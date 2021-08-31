@@ -28,73 +28,6 @@ namespace FileService
             _configuration = configuration;
         }
 
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.Configure<DatabaseSettings>(
-                _configuration.GetSection("DatabaseSettings"));
-
-            services.AddSingleton<IDatabaseSettings>(provider =>
-                provider.GetRequiredService<IOptions<DatabaseSettings>>().Value);
-
-            services.AddSingleton<IMongoClient>(sp =>
-            {
-                var settings = sp.GetRequiredService<IDatabaseSettings>();
-                return new MongoClient(settings.ConnectionString);
-            });
-
-            services.AddTransient(c =>
-                c.GetService<IMongoClient>()?.StartSession());
-
-            services
-                .AddNatsMessageQueue(config =>
-                {
-                    config.ConfigQueueOptions((options, sp) =>
-                    {
-                        var config = sp.GetRequiredService<IConfiguration>();
-
-                        options.Url = config.GetConnectionString("Nats");
-                    });
-                })
-                .AddFile(_configuration)
-                .AddAws(_configuration);
-
-            services.AddFileServiceCore()
-                .UseMongoRepository((options, sp) =>
-                {
-                    var config = sp.GetRequiredService<IConfiguration>();
-
-                    options.MongoConnectionString = config.GetValue<string>("DatabaseSettings:ConnectionString");
-                });
-
-            services.AddTransient<IMongoContext<StationLetterFile>, MongoContext<StationLetterFile>>();
-            services.AddTransient<IMongoContext<PromotionFile>, MongoContext<PromotionFile>>();
-            services.AddTransient<IUploadService, UploadService>();
-            services.AddTransient<IStationLetterService, StationLetterService>();
-            services.AddTransient<IPromotionService, PromotionService>();
-
-            services.AddControllers()
-                .AddFluentValidation(c =>
-                {
-                    c.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-                });
-
-            services
-                .AddHealthChecks()
-                .ForwardToPrometheus();
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new() {Title = "TGS FileService API", Version = "v1"});
-
-                var xml = "TGS.Apis.FileService.xml";
-                var path = Path.Combine(AppContext.BaseDirectory, xml);
-                if (File.Exists(path))
-                {
-                    c.IncludeXmlComments(path);
-                }
-            });
-        }
-
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.UseMiddleware<ExceptionMiddleware>();
@@ -121,6 +54,84 @@ namespace FileService
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TGS FileService API"));
             }
+        }
+
+        public void ConfigureServices(IServiceCollection services)
+        {
+            services
+                .AddSingleton(
+                    provider => provider.GetRequiredService<IOptions<DatabaseSettings>>().Value)
+                .AddOptions<DatabaseSettings>()
+                .Configure<IConfiguration>((settings, config) =>
+                {
+                    settings.ConnectionString = config.GetConnectionString("File");
+                });
+
+            services.AddSingleton<IMongoClient>(sp =>
+            {
+                var settings = sp.GetRequiredService<DatabaseSettings>();
+                return new MongoClient(settings.ConnectionString);
+            });
+
+            services.AddTransient(c =>
+                c.GetService<IMongoClient>()?.StartSession());
+
+            services
+                .AddNatsMessageQueue(config =>
+                {
+                    config.ConfigQueueOptions((options, sp) =>
+                    {
+                        var config = sp.GetRequiredService<IConfiguration>();
+
+                        options.Url = config.GetConnectionString("Nats");
+                    });
+                })
+                .AddFile(_configuration);
+
+            services.AddFileServiceCore((options, sp) =>
+                {
+                    var config = sp.GetRequiredService<IConfiguration>();
+
+                    config.GetSection("AWS").Bind(options);
+                })
+                .UseMongoRepository((options, sp) =>
+                {
+                    var config = sp.GetRequiredService<IOptions<DatabaseSettings>>().Value;
+
+                    options.MongoConnectionString = config.ConnectionString;
+                });
+
+            services.AddTransient<IMongoContext<StationLetterFile>, MongoContext<StationLetterFile>>();
+            services.AddTransient<IMongoContext<PromotionFile>, MongoContext<PromotionFile>>();
+            services.AddTransient<IUploadService, UploadService>();
+            services.AddTransient<IStationLetterService, StationLetterService>();
+            services.AddTransient<IPromotionService, PromotionService>();
+
+            services.AddControllers()
+                .AddFluentValidation(c =>
+                {
+                    c.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+                });
+
+            services
+                .AddHealthChecks()
+                .ForwardToPrometheus();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new()
+                {
+                    Title = "TGS FileService API",
+                    Version = "v1"
+                });
+
+                var xml = "TGS.Apis.FileService.xml";
+                var path = Path.Combine(AppContext.BaseDirectory, xml);
+                if (File.Exists(path))
+                {
+                    c.IncludeXmlComments(path);
+                }
+            });
         }
     }
 }
