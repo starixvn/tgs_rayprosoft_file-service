@@ -33,6 +33,8 @@ aws:
     externalUrl: "https://localstack.tgsdev.gq"
     serviceUrl: "http://localstack.default:4566"
     bucket: "tgs-secret"
+
+mountMongoCert: false
     
 podAnnotations: {}
 
