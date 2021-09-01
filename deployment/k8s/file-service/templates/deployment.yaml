@@ -42,6 +42,12 @@ spec:
               name: appsettings
               readOnly: true
               subPath: appsettings.json
+            {{- if .Values.mountMongoCert }}
+            - mountPath: /etc/ssl/certs/rds-combined-ca-bundle.pem
+              name: rds-combined-ca-bundle
+              readOnly: true
+              subPath: rds-combined-ca-bundle.pem
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /fs/health
@@ -59,6 +65,11 @@ spec:
         - name: appsettings
           configMap:
             name: configmap-{{ include "file-service.fullname" . }}
+        {{- if .Values.mountMongoCert }}
+        - name: rds-combined-ca-bundle
+          configMap:
+            name: configmap-mongodb-pem
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
