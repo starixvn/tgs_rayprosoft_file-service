@@ -79,6 +79,22 @@ pipeline {
       }
     }
 
+    stage('Deploy') {
+      when {
+        expression {
+          return env.kube_ns == 'prod';
+        }
+      }
+
+      steps {
+        script {
+          input message: 'Ready to go?', ok: 'yes';
+        }
+        
+        sh "echo start deploy"
+      }
+    }
+
     stage('Deploy file-service') {
       steps {
         withKubeConfig([credentialsId: env.k8s_config]) {
@@ -96,7 +112,8 @@ pipeline {
               --set aws.public.bucket="$tgs_file_public_bucket" \
               --set aws.private.externalUrl="$tgs_file_private_external" \
               --set aws.private.serviceUrl="$tgs_file_private_service" \
-              --set aws.private.bucket="$tgs_file_private_bucket"
+              --set aws.private.bucket="$tgs_file_private_bucket" \
+              --set mountMongoCert=$tgs_mountMongoCert
 
             helm template deployment/k8s/file-service \
               --set image.tag=${TAG} \
@@ -112,6 +129,7 @@ pipeline {
               --set aws.private.externalUrl="$tgs_file_private_external" \
               --set aws.private.serviceUrl="$tgs_file_private_service" \
               --set aws.private.bucket="$tgs_file_private_bucket" \
+              --set mountMongoCert=$tgs_mountMongoCert \
             | kubectl -n ${kube_ns} apply -f - 
           '''
         }
