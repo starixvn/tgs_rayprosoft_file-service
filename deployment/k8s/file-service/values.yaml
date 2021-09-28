@@ -6,7 +6,7 @@ replicaCount: 1
 
 image:
   repository: registry.gitlab.com/rayprosoft/turnkey-gaming-system/file-service
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: "dev"
 
