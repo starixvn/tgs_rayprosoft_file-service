@@ -71,14 +71,21 @@ spec:
             name: configmap-mongodb-pem
         {{- end }}
       {{- with .Values.nodeSelector }}
+      {{ if eq .Values.namespace "staging" }}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.tolerations }}
+        dedicated: nonprod
       tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      - effect: NoSchedule
+        key: dedicated
+        operator: Equal
+        value: nonprod
+      {{ end }}
+      {{ if eq .Values.namespace "prod" }}
+      nodeSelector:
+        dedicated: prod
+      tolerations:
+      - effect: NoSchedule
+        key: dedicated
+        operator: Equal
+        value: prod
+      {{ end }}
