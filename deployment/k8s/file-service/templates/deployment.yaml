@@ -88,4 +88,3 @@ spec:
           configMap:
             name: configmap-mongodb-pem
         {{- end }}
-      {{- with .Values.nodeSelector }}
