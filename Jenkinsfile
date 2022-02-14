@@ -1,3 +1,5 @@
+@Library('global-shared-library') _
+
 def message  = ""
 
 pipeline {
@@ -97,41 +99,57 @@ pipeline {
 
     stage('Deploy file-service') {
       steps {
-        withKubeConfig([credentialsId: env.k8s_config]) {
-          sh '''
-            helm template deployment/k8s/file-service \
-              --set image.tag=${TAG} \
-              --set namespace=${kube_ns} \
-              --set connectionStrings.file="$tgs_mongo_file" \
-              --set nats.urls="$tgs_nats" \
-              --set aws.accessKeyId="$tgs_aws_access_key" \
-              --set aws.secretAccessKey="$tgs_aws_access_secret" \
-              --set aws.region="$tgs_aws_region" \
-              --set aws.public.externalUrl="$tgs_file_public_external" \
-              --set aws.public.serviceUrl="$tgs_file_public_service" \
-              --set aws.public.bucket="$tgs_file_public_bucket" \
-              --set aws.private.externalUrl="$tgs_file_private_external" \
-              --set aws.private.serviceUrl="$tgs_file_private_service" \
-              --set aws.private.bucket="$tgs_file_private_bucket" \
-              --set mountMongoCert=$tgs_mountMongoCert
+        script {
+          withKubeConfig([credentialsId: env.k8s_config]) {
 
-            helm template deployment/k8s/file-service \
-              --set image.tag=${TAG} \
-              --set namespace=${kube_ns} \
-              --set connectionStrings.file="$tgs_mongo_file" \
-              --set nats.urls="$tgs_nats" \
-              --set aws.accessKeyId="$tgs_aws_access_key" \
-              --set aws.secretAccessKey="$tgs_aws_access_secret" \
-              --set aws.region="$tgs_aws_region" \
-              --set aws.public.externalUrl="$tgs_file_public_external" \
-              --set aws.public.serviceUrl="$tgs_file_public_service" \
-              --set aws.public.bucket="$tgs_file_public_bucket" \
-              --set aws.private.externalUrl="$tgs_file_private_external" \
-              --set aws.private.serviceUrl="$tgs_file_private_service" \
-              --set aws.private.bucket="$tgs_file_private_bucket" \
-              --set mountMongoCert=$tgs_mountMongoCert \
-            | kubectl -n ${kube_ns} apply -f - 
-          '''
+            def resources = getResources(env.k8s_config, env.kube_ns, "file-service")
+            println resources
+
+            sh """
+              cat << EOF | yq e -P | helm template deployment/k8s/file-service \
+                --set image.tag=${TAG} \
+                --set namespace=${kube_ns} \
+                --set connectionStrings.file="$tgs_mongo_file" \
+                --set nats.urls="$tgs_nats" \
+                --set aws.accessKeyId="$tgs_aws_access_key" \
+                --set aws.secretAccessKey="$tgs_aws_access_secret" \
+                --set aws.region="$tgs_aws_region" \
+                --set aws.public.externalUrl="$tgs_file_public_external" \
+                --set aws.public.serviceUrl="$tgs_file_public_service" \
+                --set aws.public.bucket="$tgs_file_public_bucket" \
+                --set aws.private.externalUrl="$tgs_file_private_external" \
+                --set aws.private.serviceUrl="$tgs_file_private_service" \
+                --set aws.private.bucket="$tgs_file_private_bucket" \
+                --set mountMongoCert=$tgs_mountMongoCert \
+                -f -
+                {
+                    "resources": $resources
+                }
+            """
+            sh """ 
+              cat << EOF | yq e -P | helm template deployment/k8s/file-service \
+                --set image.tag=${TAG} \
+                --set namespace=${kube_ns} \
+                --set connectionStrings.file="$tgs_mongo_file" \
+                --set nats.urls="$tgs_nats" \
+                --set aws.accessKeyId="$tgs_aws_access_key" \
+                --set aws.secretAccessKey="$tgs_aws_access_secret" \
+                --set aws.region="$tgs_aws_region" \
+                --set aws.public.externalUrl="$tgs_file_public_external" \
+                --set aws.public.serviceUrl="$tgs_file_public_service" \
+                --set aws.public.bucket="$tgs_file_public_bucket" \
+                --set aws.private.externalUrl="$tgs_file_private_external" \
+                --set aws.private.serviceUrl="$tgs_file_private_service" \
+                --set aws.private.bucket="$tgs_file_private_bucket" \
+                --set mountMongoCert=$tgs_mountMongoCert \
+                -f - \
+              | kubectl -n ${kube_ns} apply -f -
+                  {
+                      "resources": $resources
+                  }
+
+            """
+          }
         }
       }
     }
