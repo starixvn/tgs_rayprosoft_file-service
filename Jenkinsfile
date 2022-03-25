@@ -108,26 +108,31 @@ pipeline {
           withKubeConfig([credentialsId: env.k8s_config]) {
 
             def resources = getResources(env.k8s_config, env.kube_ns, "file-service")
-            println resources
+            def dedicated = getTgsSettings(env.k8s_config, env.kube_ns, "dedicated")
+            def node_selector = getTgsSettings(env.k8s_config, env.kube_ns, "node-selector")
 
             sh """
               cat << EOF | yq e -P | helm template deployment/k8s/file-service \
                 -n ${kube_ns} \
                 --set image.tag=${TAG} \
                 -f -
-                {
-                    "resources": $resources
-                }
+              {
+                  "nodeSelector": $node_selector,
+                  "tolerations": [$dedicated],
+                  "resources": $resources
+              }
             """
             sh """ 
               cat << EOF | yq e -P | helm template deployment/k8s/file-service \
                 -n ${kube_ns} \
                 --set image.tag=${TAG} \
                 -f - \
-              | kubectl -n ${kube_ns} apply -f -
-                  {
-                      "resources": $resources
-                  }
+                | kubectl -n ${kube_ns} apply -f -
+              {
+                  "nodeSelector": $node_selector,
+                  "tolerations": [$dedicated],
+                  "resources": $resources
+              }
 
             """
           }
