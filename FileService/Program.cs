@@ -19,12 +19,23 @@ using Tgs.MessageQueue;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.ConfigureAppConfiguration((_, builder) =>
-{
-    builder
-        .AddJsonFile("/config/appsettings.json", true)
-        .AddEnvironmentVariables();
-});
+builder.Configuration
+    .AddJsonFile("/config/appsettings.json", true)
+    .AddEnvironmentVariables();
+
+builder.Logging
+    .AddOpenTelemetry(options =>
+    {
+        options.IncludeFormattedMessage = true;
+        options.ParseStateValues = true;
+        _ = options.AddFluentdForwardExporter(fluentOptions =>
+        {
+            var nodeIp = builder.Configuration.GetValue<string>("NODE_IP");
+            fluentOptions.Host = nodeIp;
+            fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME");
+            fluentOptions.UseMessagePack();
+        });
+    });
 
 builder.Services
     .AddSingleton(
@@ -41,8 +52,8 @@ builder.Services.AddSingleton<IMongoClient>(sp =>
     return new MongoClient(settings.ConnectionString);
 });
 
-builder.Services.AddTransient(c =>
-    c.GetService<IMongoClient>()?.StartSession());
+builder.Services
+    .AddTransient(c => c.GetRequiredService<IMongoClient>().StartSession());
 
 builder.Services
     .AddNatsMessageQueue(config =>
@@ -56,7 +67,8 @@ builder.Services
     })
     .AddFile(builder.Configuration);
 
-builder.Services.AddFileServiceCore((options, sp) =>
+builder.Services
+    .AddFileServiceCore((options, sp) =>
     {
         var config = sp.GetRequiredService<IConfiguration>();
 
@@ -76,36 +88,23 @@ builder.Services
     .AddTransient<IStationLetterService, StationLetterService>()
     .AddTransient<IPromotionService, PromotionService>();
 
-builder.Services.AddControllers()
+builder.Services
+    .AddControllers()
     .AddFluentValidation(c =>
     {
         c.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly());
     });
 
-builder.Logging
-    .AddOpenTelemetry(options =>
-    {
-        options.IncludeFormattedMessage = true;
-        options.ParseStateValues = true;
-        _ = options.AddFluentdForwardExporter(fluentOptions =>
-        {
-            var nodeIp = builder.Configuration.GetValue<string>("NODE_IP");
-            fluentOptions.Host = nodeIp;
-            fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME");
-            fluentOptions.UseMessagePack();
-        });
-    });
-
 builder.Services
     .AddOptions<OtlpExporterOptions>()
-    .Configure<IConfiguration>((options, conifg) =>
+    .Configure<IConfiguration>((options, config) =>
     {
-        var nodeIp = conifg.GetValue<string>("NODE_IP");
+        var nodeIp = config.GetValue<string>("NODE_IP");
 
         if (!string.IsNullOrWhiteSpace(nodeIp))
             options.Endpoint = new Uri($"http://{nodeIp}:4317");
 
-        conifg.GetSection("Opentelemetry:Tracing").Bind(options);
+        config.GetSection("Opentelemetry:Tracing").Bind(options);
     });
 
 builder.Services
@@ -122,36 +121,19 @@ builder.Services
         })
         .AddProfileViewExporter()
         .AddOtlpExporter())
-    .Configure<AspNetCoreInstrumentationOptions>(options =>
-    {
-        options.Filter = httpContext =>
-        {
-            return !httpContext.Request.Path.HasValue
-                || !httpContext.Request.Path.StartsWithSegments("/swagger")
-                && !httpContext.Request.Path.StartsWithSegments("/health")
-                && !httpContext.Request.Path.StartsWithSegments("/profiler/")
-                && !new[]
-                {
-                    "html",
-                    "ico",
-                    "png",
-                    "jpg"
-                }.Any(
-                    ext => httpContext.Request.Path.Value.EndsWith($".{ext}"));
-        };
-    });
+    .Configure<AspNetCoreInstrumentationOptions>(options => options.Filter =
+        httpContext => !httpContext.Request.Path.HasValue
+            || !httpContext.Request.Path.StartsWithSegments("/swagger")
+            && !httpContext.Request.Path.StartsWithSegments("/metrics")
+            && !httpContext.Request.Path.StartsWithSegments("/fs/health")
+            && !httpContext.Request.Path.StartsWithSegments("/profiler/")
+            && !new[] { "html", "ico", "png", "jpg" }
+                .Any(ext => httpContext.Request.Path.Value.EndsWith($".{ext}")))
+    .AddProfileViewer();
 
-builder.Services.AddProfileViewer();
-
-builder.Services.AddHealthChecks();
-
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
+builder.Services
+    .AddSwaggerGen()
+    .AddHealthChecks();
 
 var app = builder.Build();
 
@@ -169,9 +151,10 @@ app.UseExceptionHandler(new ExceptionHandlerOptions
 
             var messageSender = app.Services.GetRequiredService<IMessageSender>();
 
-            await messageSender.PublishAsync("report.error",
-                    Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new ReportErrorMessage(
-                        $"{app.Environment}: {exceptionFeature.Error.Message}"))))
+            await messageSender.PublishAsync(
+                "file.service.error",
+                Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new ReportErrorMessage(
+                    $"{app.Environment}: {exceptionFeature.Error.Message}"))))
                 .ConfigureAwait(false);
         }
     }
@@ -180,6 +163,7 @@ app.UseExceptionHandler(new ExceptionHandlerOptions
 app.UseSwaggerUI();
 
 app.MapControllers();
+app.MapProfileViewer();
 app.MapSwagger();
 app.MapHealthChecks("/fs/health");
 

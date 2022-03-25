@@ -15,25 +15,6 @@ imagePullSecrets:
 nameOverride: "file-service"
 fullnameOverride: "file-service"
 
-connectionStrings:
-  file: mongodb://admin:abcd1234@192.168.50.111/filedb?retryWrites=true&w=majority&authSource=admin
-
-nats:
-  urls: nats://nats-client:4222
-  
-aws: 
-  accessKeyId: "test"
-  secretAccessKey: "test"
-  region: "ap-east-1"
-  public: 
-    externalUrl: "https://localstack.tgsdev.gq"
-    serviceUrl: "http://localstack.default:4566"
-    bucket: "tgs-project"
-  private:
-    externalUrl: "https://localstack.tgsdev.gq"
-    serviceUrl: "http://localstack.default:4566"
-    bucket: "tgs-secret"
-
 mountMongoCert: false
     
 podAnnotations: {}
