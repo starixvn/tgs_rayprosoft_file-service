@@ -76,7 +76,7 @@ pipeline {
 
     stage('Building file-service image') {
       steps {
-        sh 'dotnet build "FileService" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
+        sh 'dotnet build "FileService/FileService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
       }
     }
 
