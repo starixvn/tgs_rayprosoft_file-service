@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "file-service.fullname" . }}
-  namespace: {{ .Values.namespace }}
   labels:
     {{- include "file-service.labels" . | nindent 4 }}
 spec:
@@ -57,7 +56,7 @@ spec:
               protocol: TCP
           env:
             - name: OTEL_SERVICE_NAME
-              value: Report-Api({{ .Release.Namespace }})
+              value: File-Service({{ .Release.Namespace }})
             - name: NODE_IP
               valueFrom:
                 fieldRef:
