@@ -6,7 +6,7 @@ pipeline {
   agent any
 
   environment {
-    ImageName = "registry.gitlab.com/rayprosoft/turnkey-gaming-system/file-service"
+    ImageName = "harbor.rpgp.cc/tgs/file-service"
     BuildConfiguration = 'Debug'
   }
 
@@ -77,9 +77,14 @@ pipeline {
     stage('Building file-service image') {
       steps {
         sh 'dotnet build "FileService" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
-        sh 'docker push $ImageName:${TAG}'
       }
     }
+
+    stage('Push Docker Image') {
+			steps {
+                sh 'docker push $ImageName:${TAG}'
+			}
+		}
 
     stage('Deploy') {
       when {
