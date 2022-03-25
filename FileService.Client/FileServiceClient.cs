@@ -6,20 +6,16 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using TGS.Core.Infrastructures.Json;
 
 namespace Tgs.FileService.Clients
 {
     internal class FileServiceClient : IFileServiceClient
     {
         private readonly HttpClient _httpClient;
-        private readonly IJsonSerializationProvider _jsonSerializationProvider;
 
-        public FileServiceClient(HttpClient httpClient, IJsonSerializationProvider jsonSerializationProvider)
+        public FileServiceClient(HttpClient httpClient)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _jsonSerializationProvider = jsonSerializationProvider ??
-                throw new ArgumentNullException(nameof(jsonSerializationProvider));
         }
 
         public async ValueTask<FileView> FindFileByObjectIdAsync(string objectId)
@@ -32,9 +28,9 @@ namespace Tgs.FileService.Clients
 
             var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            var view = _jsonSerializationProvider.DeserializeFromString<FileView>(
+            var view = JsonSerializer.Deserialize<FileView>(
                 json,
-                new() {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
 
             return view;
         }
@@ -64,9 +60,9 @@ namespace Tgs.FileService.Clients
 
             var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            var view = _jsonSerializationProvider.DeserializeFromString<FileView>(
+            var view = JsonSerializer.Deserialize<FileView>(
                 json,
-                new() {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
 
             return view;
         }
@@ -91,16 +87,16 @@ namespace Tgs.FileService.Clients
 
             var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
 
-            var view = _jsonSerializationProvider.DeserializeFromString<FileView>(
+            var view = JsonSerializer.Deserialize<FileView>(
                 json,
-                new() {PropertyNamingPolicy = JsonNamingPolicy.CamelCase});
+                new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
 
             return view;
         }
 
         public async Task UpdateStationLetterFileAsync(string uploadType, string id, UpdateFilesRequest request)
         {
-            var httpContent = new StringContent(_jsonSerializationProvider.SerializeToString(request), Encoding.UTF8,
+            var httpContent = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8,
                 "application/json");
 
             await _httpClient
