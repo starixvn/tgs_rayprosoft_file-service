@@ -2,6 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "file-service.fullname" . }}
+  annotations:
+    secret.reloader.stakater.com/reload: "tgs-connections"
+    configmap.reloader.stakater.com/reload: "configmap-{{ include "file-service.fullname" . }}"
   labels:
     {{- include "file-service.labels" . | nindent 4 }}
 spec:
