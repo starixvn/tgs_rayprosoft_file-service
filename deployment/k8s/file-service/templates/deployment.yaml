@@ -55,6 +55,73 @@ spec:
             - name: http
               containerPort: 80
               protocol: TCP
+          env:
+            - name: OTEL_SERVICE_NAME
+              value: Report-Api({{ .Release.Namespace }})
+            - name: NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.hostIP
+            - name: ConnectionStrings__File
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: mongo-file
+            - name: ConnectionStrings__Nats
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: nats
+            - name: AWS__AccessKeyId
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: aws-accessKeyId
+            - name: AWS__SecretAccessKey
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: aws-secretAccessKey
+            - name: AWS__Region
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: aws-region
+            - name: AWS__UseHttp
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: aws-useHttp
+            - name: AWS__Public__ExternalServiceUrl
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: aws-public-externalServiceUrl
+            - name: AWS__Public__ServiceUrl
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: aws-public-serviceUrl
+            - name: AWS__Public__Bucket
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: aws-public-bucket
+            - name: AWS__Private__ExternalServiceUrl
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: aws-private-externalServiceUrl
+            - name: AWS__Private__ServiceUrl
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: aws-private-serviceUrl
+            - name: AWS__Private__Bucket
+              valueFrom:
+                secretKeyRef:
+                  name: tgs-connections
+                  key: aws-private-bucket
           volumeMounts:
             - mountPath: /config/appsettings.json
               name: appsettings

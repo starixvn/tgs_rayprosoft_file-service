@@ -1,7 +1,6 @@
-﻿using System;
-using FileService.Core.Configuration;
+﻿using FileService.Core.Configuration;
 using MongoFileMetaRepository;
-using MongoFileMetaRepository.Model;
+using File = MongoFileMetaRepository.Model.File;
 
 namespace Microsoft.Extensions.DependencyInjection
 {

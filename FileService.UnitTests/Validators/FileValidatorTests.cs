@@ -1,5 +1,4 @@
-﻿using System;
-using AutoFixture;
+﻿using AutoFixture;
 using AutoFixture.Dsl;
 using AutoFixture.Kernel;
 using FileService.Controllers.Messages;
@@ -9,7 +8,7 @@ using FluentValidation.TestHelper;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using TGS.Apis.FileService.Resources;
+using File = TGS.Apis.FileService.Resources.File;
 
 namespace FileService.UnitTests.Validators
 {
@@ -33,7 +32,7 @@ namespace FileService.UnitTests.Validators
         {
             CreateGreater2MFile();
 
-            var model = new UploadRequest {File = fileMock.Object};
+            var model = new UploadRequest { File = fileMock.Object };
             var result = _validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(request => request.File.Length)
                 .WithErrorMessage(File.FileMaxLength);
@@ -44,7 +43,7 @@ namespace FileService.UnitTests.Validators
         {
             CreateFile();
 
-            var model = new UploadRequest {File = fileMock.Object};
+            var model = new UploadRequest { File = fileMock.Object };
             var result = _validator.TestValidate(model);
             result.ShouldNotHaveValidationErrorFor(request => request.File.Length);
         }
@@ -54,7 +53,7 @@ namespace FileService.UnitTests.Validators
         {
             CreateWrongSignatureFile();
 
-            var model = new UploadRequest {File = fileMock.Object};
+            var model = new UploadRequest { File = fileMock.Object };
             var result = _validator.TestValidate(model);
             result.ShouldHaveValidationErrorFor(request => request.File)
                 .WithErrorMessage(File.InvalidImageSignature);
@@ -68,7 +67,7 @@ namespace FileService.UnitTests.Validators
         {
             CreateFile(extension);
 
-            var model = new UploadRequest {File = fileMock.Object};
+            var model = new UploadRequest { File = fileMock.Object };
             var result = _validator.TestValidate(model);
             result.ShouldNotHaveValidationErrorFor(request => request.File);
         }
