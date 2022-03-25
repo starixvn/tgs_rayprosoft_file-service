@@ -112,8 +112,8 @@ pipeline {
 
             sh """
               cat << EOF | yq e -P | helm template deployment/k8s/file-service \
+                -n ${kube_ns} \
                 --set image.tag=${TAG} \
-                --set namespace=${kube_ns} \
                 --set connectionStrings.file="$tgs_mongo_file" \
                 --set nats.urls="$tgs_nats" \
                 --set aws.accessKeyId="$tgs_aws_access_key" \
@@ -133,8 +133,8 @@ pipeline {
             """
             sh """ 
               cat << EOF | yq e -P | helm template deployment/k8s/file-service \
+                -n ${kube_ns} \
                 --set image.tag=${TAG} \
-                --set namespace=${kube_ns} \
                 --set connectionStrings.file="$tgs_mongo_file" \
                 --set nats.urls="$tgs_nats" \
                 --set aws.accessKeyId="$tgs_aws_access_key" \

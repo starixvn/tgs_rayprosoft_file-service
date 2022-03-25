@@ -1,4 +1,5 @@
 ﻿using System;
+using Amazon;
 using FileService.Core;
 using FileService.Core.Configuration;
 using Microsoft.Extensions.Options;
@@ -25,6 +26,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 return new PublicAmazonS3Client(settings.AccessKeyId, settings.SecretAccessKey,
                     new()
                     {
+                        AuthenticationRegion = settings.Region,
                         UseHttp = settings.UseHttp,
                         ServiceURL = settings.Public.ServiceUrl,
                         ForcePathStyle = true
@@ -42,6 +44,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 return new PrivateAmazonS3Client(settings.AccessKeyId, settings.SecretAccessKey,
                     new()
                     {
+                        AuthenticationRegion = settings.Region,
                         UseHttp = settings.UseHttp,
                         ServiceURL = settings.Private.ServiceUrl,
                         ForcePathStyle = true
