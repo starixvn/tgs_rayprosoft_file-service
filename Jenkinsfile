@@ -6,7 +6,7 @@ pipeline {
   agent any
 
   environment {
-    ImageName = "harbor.rpgp.cc/tgs/file-service"
+    ImageName = "pgtgs/file-service"
     BuildConfiguration = 'Debug'
   }
 
