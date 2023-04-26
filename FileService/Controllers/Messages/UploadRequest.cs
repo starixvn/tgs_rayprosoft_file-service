@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿namespace FileService.Controllers.Messages;
 
-namespace FileService.Controllers.Messages
+public class UploadRequest
 {
-    public class UploadRequest
-    {
-        public IFormFile File { get; set; }
-    }
+    public IFormFile File { get; set; }
 }

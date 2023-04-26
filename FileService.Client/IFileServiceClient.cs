@@ -1,18 +1,15 @@
-﻿using System.IO;
-using System.Net.Http.Headers;
-using System.Threading.Tasks;
+﻿using System.Net.Http.Headers;
 
-namespace Tgs.FileService.Clients
+namespace Tgs.FileService.Clients;
+
+public interface IFileServiceClient
 {
-    public interface IFileServiceClient
-    {
-        ValueTask<FileView> UploadFileAsync(string path, MediaTypeHeaderValue contentType, Stream fileStream);
+    ValueTask<FileView> UploadFileAsync(string path, MediaTypeHeaderValue contentType, Stream fileStream);
 
-        ValueTask<FileView> UploadPublicFileAsync(string path, MediaTypeHeaderValue contentType, Stream fileStream);
+    ValueTask<FileView> UploadPublicFileAsync(string path, MediaTypeHeaderValue contentType, Stream fileStream);
 
-        ValueTask<FileView> FindFileByObjectIdAsync(string objectId);
+    ValueTask<FileView> FindFileByObjectIdAsync(string objectId);
 
-        ValueTask<Stream> OpenFileReaderAsync(string path);
-        Task UpdateStationLetterFileAsync(string uploadType, string id, UpdateFilesRequest request);
-    }
+    ValueTask<Stream> OpenFileReaderAsync(string path);
+    Task UpdateStationLetterFileAsync(string uploadType, string id, UpdateFilesRequest request);
 }

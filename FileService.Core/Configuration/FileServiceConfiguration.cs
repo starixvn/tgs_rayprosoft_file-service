@@ -1,31 +1,29 @@
-﻿using System;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace FileService.Core.Configuration
+namespace FileService.Core.Configuration;
+
+public class FileServiceConfiguration
 {
-    public class FileServiceConfiguration
+    public IServiceCollection Services { get; }
+
+    public FileServiceConfiguration(IServiceCollection services)
     {
-        public IServiceCollection Services { get; }
+        Services = services ?? throw new ArgumentNullException(nameof(services));
+    }
 
-        public FileServiceConfiguration(IServiceCollection services)
-        {
-            Services = services ?? throw new ArgumentNullException(nameof(services));
-        }
+    public FileServiceConfiguration UseRepository<TRepository>() where TRepository : class, IFileMetaRepository
+    {
+        Services.AddTransient<IFileMetaRepository, TRepository>();
 
-        public FileServiceConfiguration UseRepository<TRepository>() where TRepository : class, IFileMetaRepository
-        {
-            Services.AddTransient<IFileMetaRepository, TRepository>();
+        return this;
+    }
 
-            return this;
-        }
+    public FileServiceConfiguration ConfigureAwsOptions(Action<AwsOptions, IServiceProvider> configure)
+    {
+        Services
+            .AddOptions<AwsOptions>()
+            .Configure(configure);
 
-        public FileServiceConfiguration ConfigureAwsOptions(Action<AwsOptions, IServiceProvider> configure)
-        {
-            Services
-                .AddOptions<AwsOptions>()
-                .Configure(configure);
-
-            return this;
-        }
+        return this;
     }
 }

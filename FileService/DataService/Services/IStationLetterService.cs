@@ -1,9 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿namespace FileService.DataService.Services;
 
-namespace FileService.DataService.Services
+public interface IStationLetterService
 {
-    public interface IStationLetterService
-    {
-        Task AddStationLetterFileAsync(string id, string[] fileNames);
-    }
+    Task AddStationLetterFileAsync(string id, string[] fileNames);
 }
