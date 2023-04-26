@@ -1,4 +1,3 @@
-﻿namespace FileService
-{
-    public record ReportErrorMessage(string Message);
-}
+﻿namespace FileService;
+
+public record ReportErrorMessage(string Message);

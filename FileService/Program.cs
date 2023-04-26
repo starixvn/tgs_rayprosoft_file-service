@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using FileService;
@@ -32,7 +31,7 @@ builder.Logging
         {
             var nodeIp = builder.Configuration.GetValue<string>("NODE_IP");
             fluentOptions.Host = nodeIp;
-            fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME");
+            fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME")!;
             fluentOptions.UseMessagePack();
         });
     });
@@ -43,7 +42,7 @@ builder.Services
     .AddOptions<DatabaseSettings>()
     .Configure<IConfiguration>((settings, config) =>
     {
-        settings.ConnectionString = config.GetConnectionString("File");
+        settings.ConnectionString = config.GetConnectionString("File")!;
     });
 
 builder.Services.AddSingleton<IMongoClient>(sp =>
@@ -56,15 +55,18 @@ builder.Services
     .AddTransient(c => c.GetRequiredService<IMongoClient>().StartSession());
 
 builder.Services
+    .AddMessageQueue()
     .AddNatsMessageQueue(config =>
     {
         config.ConfigQueueOptions((options, sp) =>
         {
             var config = sp.GetRequiredService<IConfiguration>();
 
-            options.Url = config.GetConnectionString("Nats");
+            options.Url = config.GetConnectionString("Nats")!;
         });
-    })
+    });
+
+builder.Services
     .AddFile(builder.Configuration);
 
 builder.Services
@@ -89,11 +91,9 @@ builder.Services
     .AddTransient<IPromotionService, PromotionService>();
 
 builder.Services
-    .AddControllers()
-    .AddFluentValidation(c =>
-    {
-        c.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-    });
+    .AddFluentValidationAutoValidation(config => config.DisableDataAnnotationsValidation = true)
+    .AddFluentValidationClientsideAdapters()
+    .AddControllers();
 
 builder.Services
     .AddOptions<OtlpExporterOptions>()
@@ -102,13 +102,16 @@ builder.Services
         var nodeIp = config.GetValue<string>("NODE_IP");
 
         if (!string.IsNullOrWhiteSpace(nodeIp))
-            options.Endpoint = new Uri($"http://{nodeIp}:4317");
+        {
+            options.Endpoint = new($"http://{nodeIp}:4317");
+        }
 
         config.GetSection("Opentelemetry:Tracing").Bind(options);
     });
 
 builder.Services
-    .AddOpenTelemetryTracing(builder => builder
+    .AddOpenTelemetry()
+    .WithTracing(builder => builder
         .SetResourceBuilder(ResourceBuilder.CreateDefault()
             .AddEnvironmentVariableDetector())
         .AddSource("Tgs.*")
@@ -121,13 +124,20 @@ builder.Services
         })
         .AddProfileViewExporter()
         .AddOtlpExporter())
+    .Services
     .Configure<AspNetCoreInstrumentationOptions>(options => options.Filter =
         httpContext => !httpContext.Request.Path.HasValue
             || !httpContext.Request.Path.StartsWithSegments("/swagger")
             && !httpContext.Request.Path.StartsWithSegments("/metrics")
             && !httpContext.Request.Path.StartsWithSegments("/fs/health")
             && !httpContext.Request.Path.StartsWithSegments("/profiler/")
-            && !new[] { "html", "ico", "png", "jpg" }
+            && !new[]
+                {
+                    "html",
+                    "ico",
+                    "png",
+                    "jpg"
+                }
                 .Any(ext => httpContext.Request.Path.Value.EndsWith($".{ext}")))
     .AddProfileViewer();
 
@@ -152,9 +162,9 @@ app.UseExceptionHandler(new ExceptionHandlerOptions
             var messageSender = app.Services.GetRequiredService<IMessageSender>();
 
             await messageSender.PublishAsync(
-                "file.service.error",
-                Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new ReportErrorMessage(
-                    $"{app.Environment}: {exceptionFeature.Error.Message}"))))
+                    "file.service.error",
+                    Encoding.UTF8.GetBytes(JsonSerializer.Serialize(new ReportErrorMessage(
+                        $"{app.Environment}: {exceptionFeature.Error.Message}"))))
                 .ConfigureAwait(false);
         }
     }

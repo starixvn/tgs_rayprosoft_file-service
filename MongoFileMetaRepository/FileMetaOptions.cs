@@ -1,7 +1,6 @@
-﻿namespace MongoFileMetaRepository
+﻿namespace MongoFileMetaRepository;
+
+public class FileMetaOptions
 {
-    public class FileMetaOptions
-    {
-        public string MongoConnectionString { get; set; }
-    }
+    public string MongoConnectionString { get; set; } = default!;
 }

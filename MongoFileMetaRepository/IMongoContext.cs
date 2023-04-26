@@ -1,32 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
+﻿using System.Linq.Expressions;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
-namespace MongoFileMetaRepository
+namespace MongoFileMetaRepository;
+
+public interface IMongoContext<T>
 {
-    public interface IMongoContext<T>
-    {
-        Task InsertAsync(T obj);
+    Task InsertAsync(T obj);
 
-        Task UpdateAsync(T obj);
+    Task UpdateAsync(T obj);
 
-        Task DeleteAsync(string id);
+    Task DeleteAsync(string id);
 
-        Task DeleteManyAsync(string[] ids);
+    Task DeleteManyAsync(string[] ids);
 
-        Task<T> GetByIdAsync(string id);
+    Task<T> GetByIdAsync(string id);
 
-        IMongoQueryable<T> GetQueries();
+    IMongoQueryable<T> GetQueries();
 
-        Task<IAsyncCursor<T>> GetListAsync(Expression<Func<T, bool>> expression);
+    Task<IAsyncCursor<T>> GetListAsync(Expression<Func<T, bool>> expression);
 
-        Task<bool> CanConnection();
+    Task<bool> CanConnection();
 
-        Task<List<T>> GetListByFilterAsync(FilterDefinition<T> filter);
+    Task<List<T>> GetListByFilterAsync(FilterDefinition<T> filter);
 
-        Task<T> GetByFilterAsync(FilterDefinition<T> filter);
-    }
+    Task<T> GetByFilterAsync(FilterDefinition<T> filter);
 }

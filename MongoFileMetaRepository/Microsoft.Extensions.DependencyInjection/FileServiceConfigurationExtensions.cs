@@ -2,21 +2,20 @@
 using MongoFileMetaRepository;
 using File = MongoFileMetaRepository.Model.File;
 
-namespace Microsoft.Extensions.DependencyInjection
-{
-    public static class FileServiceConfigurationExtensions
-    {
-        public static FileServiceConfiguration UseMongoRepository(this FileServiceConfiguration configuration,
-            Action<FileMetaOptions, IServiceProvider> configure)
-        {
-            configuration.Services
-                .AddOptions<FileMetaOptions>()
-                .Configure(configure)
-                .Services
-                .AddTransient<IMongoContext<File>, MongoContext<File>>();
+namespace Microsoft.Extensions.DependencyInjection;
 
-            return configuration
-                .UseRepository<MongoFileMetaRepository.MongoFileMetaRepository>();
-        }
+public static class FileServiceConfigurationExtensions
+{
+    public static FileServiceConfiguration UseMongoRepository(this FileServiceConfiguration configuration,
+        Action<FileMetaOptions, IServiceProvider> configure)
+    {
+        configuration.Services
+            .AddOptions<FileMetaOptions>()
+            .Configure(configure)
+            .Services
+            .AddTransient<IMongoContext<File>, MongoContext<File>>();
+
+        return configuration
+            .UseRepository<MongoFileMetaRepository.MongoFileMetaRepository>();
     }
 }

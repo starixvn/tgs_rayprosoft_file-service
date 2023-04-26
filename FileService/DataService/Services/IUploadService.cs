@@ -1,13 +1,10 @@
-﻿using System.Threading.Tasks;
-using FileService.Core;
-using Microsoft.AspNetCore.Http;
+﻿using FileService.Core;
 
-namespace FileService.DataService.Services
+namespace FileService.DataService.Services;
+
+public interface IUploadService
 {
-    public interface IUploadService
-    {
-        Task<FileMeta> UploadFileS3Async(string prefix, IFormFile formFile);
+    Task<FileMeta> UploadFileS3Async(string prefix, IFormFile formFile);
 
-        ValueTask<string[]> GetObjectsAsync(string prefix = null);
-    }
+    ValueTask<string[]> GetObjectsAsync(string prefix = null);
 }
