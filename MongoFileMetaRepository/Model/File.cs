@@ -2,9 +2,9 @@
 
 public class File : BaseEntity
 {
-    public string FileName { get; set; }
+    public string FileName { get; set; } = null!;
 
-    public string ContentType { get; set; }
+    public string ContentType { get; set; } = null!;
 
     public decimal FileLength { get; set; }
 

@@ -39,6 +39,6 @@ public class UploadServiceTests : BaseTests
 
         var fileMeta = await sut.UploadFileS3Async(prefix, file);
 
-        Assert.AreEqual(expected, fileMeta.ExternalUrl);
+        Assert.That(fileMeta.ExternalUrl, Is.EqualTo(expected));
     }
 }

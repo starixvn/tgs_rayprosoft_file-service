@@ -25,7 +25,7 @@ public class FileValidatorTests : BaseTests
     }
 
     private readonly Mock<IOptions<FileSettings>> _settingsMock = new();
-    private FileValidator _validator;
+    private FileValidator? _validator;
 
     [Test]
     public void Should_have_error_when_file_size_greater_2MB()

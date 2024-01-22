@@ -40,7 +40,7 @@ public sealed class MongoContext<T> : IMongoContext<T> where T : BaseEntity
     Task IMongoContext<T>.UpdateAsync(T obj)
     {
         Expression<Func<T, string>> func = f => f.Id;
-        var value = (string)obj.GetType().GetProperty(func.Body.ToString().Split(".")[1])?.GetValue(obj, null);
+        var value = (string)obj.GetType().GetProperty(func.Body.ToString().Split(".")[1])?.GetValue(obj, null)!;
         var filter = Builders<T>.Filter.Eq(func, value);
 
         return Collection.ReplaceOneAsync(_clientSessionHandle, filter, obj);

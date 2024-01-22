@@ -54,20 +54,20 @@ public class FileManager<TAmazonS3> : IFileManager<TAmazonS3> where TAmazonS3 : 
     public async Task<FileMeta> GetFileMetaByObjectIdAsync(string objectId) =>
         await _fileMetaRepository.FindByIdAsync(objectId).ConfigureAwait(false);
 
-    public IAsyncEnumerable<FileMeta> ListPathAsync(string prefix)
+    public IAsyncEnumerable<FileMeta> ListPathAsync(string? prefix)
         => _fileMetaRepository.ListFileMetasAsync(prefix);
 
     public Task<Stream> OpenFileStreamAsync(FileMeta meta)
     {
         var url = _amazonS3.GeneratePreSignedURL(_bucket, meta.FileName, DateTime.UtcNow.AddMinutes(5), null);
 
-        var client = new WebClient();
+        var client = new HttpClient();
         ServicePointManager.ServerCertificateValidationCallback = delegate
         {
             return true;
         };
 
-        return client.OpenReadTaskAsync(url);
+        return client.GetStreamAsync(url);
     }
 
     public async Task<FileMeta> SaveAsync(string filePath, string contentType, long contentLength,

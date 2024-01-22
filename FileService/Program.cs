@@ -30,7 +30,7 @@ builder.Logging
         _ = options.AddFluentdForwardExporter(fluentOptions =>
         {
             var nodeIp = builder.Configuration.GetValue<string>("NODE_IP");
-            fluentOptions.Host = nodeIp;
+            fluentOptions.Host = nodeIp!;
             fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME")!;
             fluentOptions.UseMessagePack();
         });
@@ -125,7 +125,7 @@ builder.Services
         .AddProfileViewExporter()
         .AddOtlpExporter())
     .Services
-    .Configure<AspNetCoreInstrumentationOptions>(options => options.Filter =
+    .Configure<AspNetCoreTraceInstrumentationOptions>(options => options.Filter =
         httpContext => !httpContext.Request.Path.HasValue
             || !httpContext.Request.Path.StartsWithSegments("/swagger")
             && !httpContext.Request.Path.StartsWithSegments("/metrics")

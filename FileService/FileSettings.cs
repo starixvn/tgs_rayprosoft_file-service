@@ -2,6 +2,6 @@
 
 public class FileSettings
 {
-    public string Path { get; set; }
+    public string Path { get; set; } = null!;
     public int FileSizeLimit { get; set; }
 }

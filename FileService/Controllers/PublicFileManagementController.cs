@@ -26,12 +26,12 @@ public class PublicFileManagementController : ControllerBase
 
         return new()
         {
-            Id = meta.Id,
+            Id = meta.Id!,
             FileName = meta.FileName,
             ContentType = meta.ContentType,
             FileLength = meta.FileLength,
             CreatedOn = meta.CreatedOn,
-            ExternalUrl = meta.ExternalUrl
+            ExternalUrl = meta.ExternalUrl!
         };
     }
 }

@@ -24,7 +24,7 @@ public sealed class UploadService : IUploadService
             .ConfigureAwait(false);
     }
 
-    public ValueTask<string[]> GetObjectsAsync(string prefix)
+    public ValueTask<string[]> GetObjectsAsync(string? prefix)
         => _fileManager.ListPathAsync(prefix)
             .Select(meta => meta.FileName)
             .ToArrayAsync();

@@ -8,7 +8,7 @@ public interface IFileManager<TAmazonS3>
 
     Task<FileMeta> SaveAsync(string filePath, string contentType, long contentLength, Stream fileStream);
 
-    IAsyncEnumerable<FileMeta> ListPathAsync(string prefix);
+    IAsyncEnumerable<FileMeta> ListPathAsync(string? prefix);
 
     Task DeleteFilesAsync(IEnumerable<FileMeta> files);
 

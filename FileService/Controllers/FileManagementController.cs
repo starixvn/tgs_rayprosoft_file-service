@@ -17,7 +17,7 @@ public class FileManagementController : ControllerBase
 
     [HttpGet("{*path}")]
     public async Task<IActionResult> GetFileAsync(
-        string path)
+        string? path)
     {
         var meta = await _fileManager.ListPathAsync(path)
             .FirstAsync()
@@ -35,12 +35,12 @@ public class FileManagementController : ControllerBase
 
         return new()
         {
-            Id = meta.Id,
+            Id = meta.Id!,
             FileName = meta.FileName,
             ContentType = meta.ContentType,
             FileLength = meta.FileLength,
             CreatedOn = meta.CreatedOn,
-            ExternalUrl = meta.ExternalUrl
+            ExternalUrl = meta.ExternalUrl!
         };
     }
 
@@ -55,12 +55,12 @@ public class FileManagementController : ControllerBase
 
         return new()
         {
-            Id = meta.Id,
+            Id = meta.Id!,
             FileName = meta.FileName,
             ContentType = meta.ContentType,
             FileLength = meta.FileLength,
             CreatedOn = meta.CreatedOn,
-            ExternalUrl = meta.ExternalUrl
+            ExternalUrl = meta.ExternalUrl!
         };
     }
 }
