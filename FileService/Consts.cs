@@ -19,11 +19,6 @@ public static class Consts
         public const string Promotion = "promotion";
         public const string MessengerQRCode = "messengerQRCode";
 
-        public static readonly string[] Types =
-        {
-            StationLetter,
-            Promotion,
-            MessengerQRCode
-        };
+        public static readonly string[] Types = { StationLetter, Promotion, MessengerQRCode };
     }
 }

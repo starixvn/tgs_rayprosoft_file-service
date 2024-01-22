@@ -2,7 +2,8 @@
 
 public static class ServiceExtensions
 {
-    public static IServiceCollection AddFile(this IServiceCollection services, IConfiguration configuration,
+    public static IServiceCollection AddFile(this IServiceCollection services,
+        IConfiguration configuration,
         string configSectionName = "FileSetting")
     {
         services.Configure<FileSettings>(configuration.GetSection(configSectionName));

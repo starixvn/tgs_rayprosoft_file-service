@@ -38,4 +38,19 @@
     <ProjectReference Include="..\MongoFileMetaRepository\MongoFileMetaRepository.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Resources\File.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>File.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\File.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>File.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

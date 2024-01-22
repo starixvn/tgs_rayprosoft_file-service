@@ -8,7 +8,7 @@ using FluentValidation.TestHelper;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using File = TGS.Apis.FileService.Resources.File;
+using File = FileService.Resources.File;
 
 namespace FileService.UnitTests.Validators;
 

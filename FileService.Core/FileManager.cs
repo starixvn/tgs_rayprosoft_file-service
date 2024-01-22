@@ -41,8 +41,7 @@ public class FileManager<TAmazonS3> : IFileManager<TAmazonS3> where TAmazonS3 : 
 
         var request = new DeleteObjectsRequest
         {
-            BucketName = _bucket,
-            Objects = files.Select(file => new KeyVersion { Key = file.FileName }).ToList()
+            BucketName = _bucket, Objects = files.Select(file => new KeyVersion { Key = file.FileName }).ToList()
         };
 
         await _amazonS3.DeleteObjectsAsync(request).ConfigureAwait(false);
@@ -70,17 +69,14 @@ public class FileManager<TAmazonS3> : IFileManager<TAmazonS3> where TAmazonS3 : 
         return client.GetStreamAsync(url);
     }
 
-    public async Task<FileMeta> SaveAsync(string filePath, string contentType, long contentLength,
+    public async Task<FileMeta> SaveAsync(string filePath,
+        string contentType,
+        long contentLength,
         Stream fileStream)
     {
         var savePath = filePath.TrimStart('/');
 
-        var request = new PutObjectRequest
-        {
-            BucketName = _bucket,
-            Key = savePath,
-            InputStream = fileStream
-        };
+        var request = new PutObjectRequest { BucketName = _bucket, Key = savePath, InputStream = fileStream };
 
         var response = await _amazonS3.PutObjectAsync(request);
 

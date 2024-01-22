@@ -12,9 +12,6 @@ public sealed class MongoContext<T> : IMongoContext<T> where T : BaseEntity
     private readonly IMongoDatabase _database;
     private readonly IMongoClient _mongoClient;
 
-    private IMongoCollection<T> Collection =>
-        _database.GetCollection<T>(typeof(T).Name);
-
     public MongoContext(
         IOptions<FileMetaOptions> optionsAccessor,
         IMongoClient mongoClient,
@@ -34,6 +31,9 @@ public sealed class MongoContext<T> : IMongoContext<T> where T : BaseEntity
             _database.CreateCollection(typeof(T).Name);
         }
     }
+
+    private IMongoCollection<T> Collection =>
+        _database.GetCollection<T>(typeof(T).Name);
 
     Task IMongoContext<T>.InsertAsync(T obj) => Collection.InsertOneAsync(_clientSessionHandle, obj);
 

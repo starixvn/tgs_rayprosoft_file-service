@@ -19,7 +19,9 @@ public sealed class UploadService : IUploadService
             $"{StringGenerator.GenerateAlphanumericString(32)}{Path.GetExtension(formFile.FileName)}";
 
         return await _fileManager
-            .SaveAsync($"{prefix}/{randomFileName}", formFile.ContentType, formFile.Length,
+            .SaveAsync($"{prefix}/{randomFileName}",
+                formFile.ContentType,
+                formFile.Length,
                 formFile.OpenReadStream())
             .ConfigureAwait(false);
     }
