@@ -11,5 +11,7 @@ namespace MongoFileMetaRepository.Model
         public decimal FileLength { get; set; }
 
         public DateTimeOffset CreatedOn { get; set; }
+
+        public byte[] InputStream { get; set; }
     }
 }
