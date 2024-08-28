@@ -136,8 +136,8 @@ spec:
             name: configmap-{{ include "file-service.fullname" . }}
         {{- if .Values.mountMongoCert }}
         - name: rds-combined-ca-bundle
-          configMap:
-            name: configmap-mongodb-pem
+          secret:
+            secertName: rds-combined-ca-bundle
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
