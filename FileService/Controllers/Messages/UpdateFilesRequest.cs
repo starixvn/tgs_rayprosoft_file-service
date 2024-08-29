@@ -1,4 +1,3 @@
-﻿namespace FileService.Controllers.Messages
-{
-    public record UpdateFilesRequest(string[] FileNames);
-}
+﻿namespace FileService.Controllers.Messages;
+
+public record UpdateFilesRequest(string[] FileNames);

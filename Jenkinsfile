@@ -1,10 +1,11 @@
+@Library('global-shared-library') _
 def message  = ""
 
 pipeline {
   agent any
 
   environment {
-    ImageName = "registry.gitlab.com/rayprosoft/turnkey-gaming-system/file-service"
+    ImageName = "pgtgs/file-service"
     BuildConfiguration = 'Debug'
   }
 
@@ -68,16 +69,21 @@ pipeline {
     stage('Push packages') {
       steps {
         sh 'dotnet pack -c $BuildConfiguration "FileService.Client/FileService.Client.csproj" --no-build'
-        sh 'dotnet nuget push "FileService.Client/bin/$BuildConfiguration/*.nupkg" --source "raypro" --skip-duplicate'
+        sh 'dotnet nuget push "FileService.Client/bin/$BuildConfiguration/*.nupkg" -s "raypro-baget" -k admin --skip-duplicate'
       }
     }
 
     stage('Building file-service image') {
       steps {
-        sh 'dotnet build "FileService" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
-        sh 'docker push $ImageName:${TAG}'
+        sh 'dotnet build "FileService/FileService.csproj" -c $BuildConfiguration -t:ContainerBuild -p:DockerfileTag="$ImageName:${TAG}" --no-restore '
       }
     }
+
+    stage('Push Docker Image') {
+			steps {
+                sh 'docker push $ImageName:${TAG}'
+			}
+		}
 
     stage('Deploy') {
       when {
@@ -97,41 +103,38 @@ pipeline {
 
     stage('Deploy file-service') {
       steps {
-        withKubeConfig([credentialsId: env.k8s_config]) {
-          sh '''
-            helm template deployment/k8s/file-service \
-              --set image.tag=${TAG} \
-              --set namespace=${kube_ns} \
-              --set connectionStrings.file="$tgs_mongo_file" \
-              --set nats.urls="$tgs_nats" \
-              --set aws.accessKeyId="$tgs_aws_access_key" \
-              --set aws.secretAccessKey="$tgs_aws_access_secret" \
-              --set aws.region="$tgs_aws_region" \
-              --set aws.public.externalUrl="$tgs_file_public_external" \
-              --set aws.public.serviceUrl="$tgs_file_public_service" \
-              --set aws.public.bucket="$tgs_file_public_bucket" \
-              --set aws.private.externalUrl="$tgs_file_private_external" \
-              --set aws.private.serviceUrl="$tgs_file_private_service" \
-              --set aws.private.bucket="$tgs_file_private_bucket" \
-              --set mountMongoCert=$tgs_mountMongoCert
+        script {
+          withKubeConfig([credentialsId: env.k8s_config]) {
 
-            helm template deployment/k8s/file-service \
-              --set image.tag=${TAG} \
-              --set namespace=${kube_ns} \
-              --set connectionStrings.file="$tgs_mongo_file" \
-              --set nats.urls="$tgs_nats" \
-              --set aws.accessKeyId="$tgs_aws_access_key" \
-              --set aws.secretAccessKey="$tgs_aws_access_secret" \
-              --set aws.region="$tgs_aws_region" \
-              --set aws.public.externalUrl="$tgs_file_public_external" \
-              --set aws.public.serviceUrl="$tgs_file_public_service" \
-              --set aws.public.bucket="$tgs_file_public_bucket" \
-              --set aws.private.externalUrl="$tgs_file_private_external" \
-              --set aws.private.serviceUrl="$tgs_file_private_service" \
-              --set aws.private.bucket="$tgs_file_private_bucket" \
-              --set mountMongoCert=$tgs_mountMongoCert \
-            | kubectl -n ${kube_ns} apply -f - 
-          '''
+            def resources = getResources(env.k8s_config, env.kube_ns, "file-service")
+            def dedicated = getTgsSettings(env.k8s_config, env.kube_ns, "dedicated")
+            def node_selector = getTgsSettings(env.k8s_config, env.kube_ns, "node-selector")
+
+            sh """
+              cat << EOF | yq e -P | helm template deployment/k8s/file-service \
+                -n ${kube_ns} \
+                --set image.tag=${TAG} \
+                -f -
+              {
+                  "nodeSelector": $node_selector,
+                  "tolerations": [$dedicated],
+                  "resources": $resources
+              }
+            """
+            sh """ 
+              cat << EOF | yq e -P | helm template deployment/k8s/file-service \
+                -n ${kube_ns} \
+                --set image.tag=${TAG} \
+                -f - \
+                | kubectl -n ${kube_ns} apply -f -
+              {
+                  "nodeSelector": $node_selector,
+                  "tolerations": [$dedicated],
+                  "resources": $resources
+              }
+
+            """
+          }
         }
       }
     }
@@ -160,33 +163,4 @@ def checkIsRunStage(currentName, selectedNames) {
     }
 
   return isRun
-}
-
-def sendTelegram(message) {
-  def encodedMessage = URLEncoder.encode(message, "UTF-8")
-
-  withCredentials([string(credentialsId: "telegramToken", variable: "TOKEN"), string(credentialsId: "telegramChatId", variable: "CHAT_ID")]) {
-
-    response = httpRequest(consoleLogResponseBody: true,
-      contentType: 'APPLICATION_JSON',
-      httpMode: 'GET',
-      url: "https://api.telegram.org/bot${TOKEN}/sendMessage?text=${encodedMessage}&chat_id=${CHAT_ID}",
-      validResponseCodes: '200')
-    return response
-  }
-}
-
-def sendTelegramHTML(message) {
-  def encodedMessage = URLEncoder.encode(message, "UTF-8")
-
-  withCredentials([string(credentialsId: "telegramToken", variable: "TOKEN"), string(credentialsId: "telegramChatId", variable: "CHAT_ID")]) {
-
-    response = httpRequest(consoleLogResponseBody: true,
-      contentType: 'APPLICATION_JSON',
-      httpMode: 'POST',
-      requestBody: "parse_mode=HTML&text=${encodedMessage}&chat_id=${CHAT_ID}",
-      url: "https://api.telegram.org/bot${TOKEN}/sendMessage",
-      validResponseCodes: '200')
-    return response
-  }
 }

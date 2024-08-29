@@ -1,19 +1,16 @@
-﻿using System;
+﻿namespace FileService.Controllers.Messages;
 
-namespace FileService.Controllers.Messages
+public record FileViewModel
 {
-    public record FileViewModel
-    {
-        public string Id { get; init; }
+    public string Id { get; init; } = null!;
 
-        public string FileName { get; init; }
+    public string FileName { get; init; } = null!;
 
-        public string ContentType { get; init; }
+    public string ContentType { get; init; } = null!;
 
-        public decimal FileLength { get; init; }
+    public decimal FileLength { get; init; }
 
-        public DateTimeOffset CreatedOn { get; init; }
+    public DateTimeOffset CreatedOn { get; init; }
 
-        public string ExternalUrl { get; init; }
-    }
+    public string ExternalUrl { get; init; } = null!;
 }

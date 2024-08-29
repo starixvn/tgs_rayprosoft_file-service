@@ -1,7 +1,6 @@
-﻿namespace FileService.DataService
+﻿namespace FileService.DataService;
+
+public record DatabaseSettings
 {
-    public record DatabaseSettings
-    {
-        public string ConnectionString { get; set; }
-    }
+    public string ConnectionString { get; set; } = null!;
 }

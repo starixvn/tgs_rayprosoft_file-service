@@ -2,28 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: configmap-{{ include "file-service.fullname" . }}
-  namespace: {{ .Values.namespace }}
 data:
   appsettings.json: |
     {
-      "ConnectionStrings": {
-        "File": "{{ .Values.connectionStrings.file }}",
-        "Nats": "{{ .Values.nats.urls }}"
-      },
-      "AWS": {
-        "AccessKeyId": "{{ .Values.aws.accessKeyId }}",
-        "SecretAccessKey": "{{ .Values.aws.secretAccessKey }}",
-        "Region": "{{ .Values.aws.region}}",
-        "UseHttp": true,
-        "Public": {
-          "ExternalServiceUrl": "{{ .Values.aws.public.externalUrl }}",
-          "ServiceUrl": "{{ .Values.aws.public.serviceUrl}}",
-          "Bucket": "{{ .Values.aws.public.bucket}}"
-        },
-        "Private": {
-          "ExternalServiceUrl": "{{ .Values.aws.private.externalUrl }}",
-          "ServiceUrl": "{{ .Values.aws.private.serviceUrl }}",
-          "Bucket": "{{ .Values.aws.private.bucket }}"
-        }
-      }
     }

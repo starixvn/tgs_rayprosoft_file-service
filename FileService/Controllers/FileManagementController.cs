@@ -1,71 +1,59 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using FileService.Controllers.Messages;
+﻿using FileService.Controllers.Messages;
 using FileService.Core;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FileService.Controllers
+namespace FileService.Controllers;
+
+[Route("api/fs")]
+[ApiController]
+public class FileManagementController(IFileManager<IPrivateAmazonS3> fileManager) : ControllerBase
 {
-    [Route("api/fs")]
-    [ApiController]
-    public class FileManagementController : ControllerBase
+    [HttpGet("{*path}")]
+    public async Task<IActionResult> GetFileAsync(
+        string? path)
     {
-        private readonly IFileManager<IPrivateAmazonS3> _fileManager;
+        var meta = await fileManager.ListPathAsync(path)
+            .FirstAsync()
+            .ConfigureAwait(false);
 
-        public FileManagementController(IFileManager<IPrivateAmazonS3> fileManager)
+        var fileStream = await fileManager.OpenFileStreamAsync(meta).ConfigureAwait(false);
+
+        return File(fileStream, meta.ContentType);
+    }
+
+    [HttpGet("~/api/meta/{objectId}")]
+    public async Task<FileViewModel> GetFileMetaAsync(string objectId)
+    {
+        var meta = await fileManager.GetFileMetaByObjectIdAsync(objectId).ConfigureAwait(false);
+
+        return new()
         {
-            _fileManager = fileManager ?? throw new ArgumentNullException(nameof(fileManager));
-        }
+            Id = meta.Id!,
+            FileName = meta.FileName,
+            ContentType = meta.ContentType,
+            FileLength = meta.FileLength,
+            CreatedOn = meta.CreatedOn,
+            ExternalUrl = meta.ExternalUrl!
+        };
+    }
 
-        [HttpGet("{*path}")]
-        public async Task<IActionResult> GetFileAsync(
-            string path)
+    [HttpPost("{*path}")]
+    public async Task<FileViewModel> UploadFileAsync(
+        string path,
+        [FromForm(Name = "file")] IFormFile file)
+    {
+        var meta = await fileManager
+            .SaveAsync(path, file.ContentType, file.Length, file.OpenReadStream())
+            .ConfigureAwait(false);
+
+        return new()
         {
-            var meta = await _fileManager.ListPathAsync(path)
-                .FirstAsync()
-                .ConfigureAwait(false);
-
-            var fileStream = await _fileManager.OpenFileStreamAsync(meta).ConfigureAwait(false);
-
-            return File(fileStream, meta.ContentType);
-        }
-
-        [HttpGet("~/api/meta/{objectId}")]
-        public async Task<FileViewModel> GetFileMetaAsync(string objectId)
-        {
-            var meta = await _fileManager.GetFileMetaByObjectIdAsync(objectId).ConfigureAwait(false);
-
-            return new()
-            {
-                Id = meta.Id,
-                FileName = meta.FileName,
-                ContentType = meta.ContentType,
-                FileLength = meta.FileLength,
-                CreatedOn = meta.CreatedOn,
-                ExternalUrl = meta.ExternalUrl
-            };
-        }
-
-        [HttpPost("{*path}")]
-        public async Task<FileViewModel> UploadFileAsync(
-            string path,
-            [FromForm(Name = "file")] IFormFile file)
-        {
-            var meta = await _fileManager
-                .SaveAsync(path, file.ContentType, file.Length, file.OpenReadStream())
-                .ConfigureAwait(false);
-
-            return new()
-            {
-                Id = meta.Id,
-                FileName = meta.FileName,
-                ContentType = meta.ContentType,
-                FileLength = meta.FileLength,
-                CreatedOn = meta.CreatedOn,
-                ExternalUrl = meta.ExternalUrl
-            };
-        }
+            Id = meta.Id!,
+            FileName = meta.FileName,
+            ContentType = meta.ContentType,
+            FileLength = meta.FileLength,
+            CreatedOn = meta.CreatedOn,
+            ExternalUrl = meta.ExternalUrl!
+        };
     }
 }
