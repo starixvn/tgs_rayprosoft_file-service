@@ -6,5 +6,5 @@ public interface IUploadService
 {
     Task<FileMeta> UploadFileS3Async(string prefix, IFormFile formFile);
 
-    ValueTask<string[]> GetObjectsAsync(string prefix = null);
+    ValueTask<string[]> GetObjectsAsync(string? prefix = null);
 }

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.Extensions.Options;
-using File = TGS.Apis.FileService.Resources.File;
+using File = FileService.Resources.File;
 
 namespace FileService.Controllers.Messages.Validators;
 

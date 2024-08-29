@@ -21,7 +21,8 @@ public static class ServiceCollectionExtensions
                 throw new ArgumentException("can't get aws settings");
             }
 
-            return new PublicAmazonS3Client(settings.AccessKeyId, settings.SecretAccessKey,
+            return new PublicAmazonS3Client(settings.AccessKeyId,
+                settings.SecretAccessKey,
                 new()
                 {
                     AuthenticationRegion = settings.Region,
@@ -39,7 +40,8 @@ public static class ServiceCollectionExtensions
                 throw new ArgumentException("can't get aws settings");
             }
 
-            return new PrivateAmazonS3Client(settings.AccessKeyId, settings.SecretAccessKey,
+            return new PrivateAmazonS3Client(settings.AccessKeyId,
+                settings.SecretAccessKey,
                 new()
                 {
                     AuthenticationRegion = settings.Region,

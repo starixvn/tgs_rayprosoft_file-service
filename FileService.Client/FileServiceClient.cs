@@ -35,7 +35,8 @@ internal class FileServiceClient : IFileServiceClient
             .GetStreamAsync($"/api/fs/{path.TrimStart('/')}")
             .ConfigureAwait(false);
 
-    public async ValueTask<FileView> UploadFileAsync(string path, MediaTypeHeaderValue contentType,
+    public async ValueTask<FileView> UploadFileAsync(string path,
+        MediaTypeHeaderValue contentType,
         Stream fileStream)
     {
         using var uploadContent = new MultipartFormDataContent();
@@ -62,7 +63,8 @@ internal class FileServiceClient : IFileServiceClient
         return view;
     }
 
-    public async ValueTask<FileView> UploadPublicFileAsync(string path, MediaTypeHeaderValue contentType,
+    public async ValueTask<FileView> UploadPublicFileAsync(string path,
+        MediaTypeHeaderValue contentType,
         Stream fileStream)
     {
         using var uploadContent = new MultipartFormDataContent();
@@ -91,7 +93,8 @@ internal class FileServiceClient : IFileServiceClient
 
     public async Task UpdateStationLetterFileAsync(string uploadType, string id, UpdateFilesRequest request)
     {
-        var httpContent = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8,
+        var httpContent = new StringContent(JsonSerializer.Serialize(request),
+            Encoding.UTF8,
             "application/json");
 
         await _httpClient

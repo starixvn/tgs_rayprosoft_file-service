@@ -14,14 +14,7 @@ public class FileManagerTests
     [Test]
     public async Task Save_File_Should_Success()
     {
-        var options = new AwsOptions
-        {
-            Private = new()
-            {
-                ExternalServiceUrl = "https://aws",
-                Bucket = "bucket"
-            }
-        };
+        var options = new AwsOptions { Private = new() { ExternalServiceUrl = "https://aws", Bucket = "bucket" } };
         var moqAmazonS3 = new Mock<IPrivateAmazonS3>();
         var moqFileMetaRepository = new Mock<IFileMetaRepository>();
 
@@ -42,7 +35,7 @@ public class FileManagerTests
             ContentType = contentType,
             FileLength = fileLength,
             CreatedOn = DateTimeOffset.UtcNow,
-            ExternalUrl = $"{options.Private.ServiceUrl}/{options.Private.Bucket}/test/path/file.ext"
+            ExternalUrl = $"{options.Private.ExternalServiceUrl}/{options.Private.Bucket}/test/path/file.ext"
         };
 
         moqAmazonS3
@@ -58,8 +51,9 @@ public class FileManagerTests
         var actual = await sut.SaveAsync(filePath, contentType, fileLength, fileStream);
 
         expected.ToExpectedObject(ctx =>
-        {
-            ctx.Ignore(obj => obj.CreatedOn);
-        }).ShouldMatch(actual);
+            {
+                ctx.Ignore(obj => obj.CreatedOn);
+            })
+            .ShouldMatch(actual);
     }
 }

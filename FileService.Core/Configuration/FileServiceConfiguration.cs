@@ -4,12 +4,12 @@ namespace FileService.Core.Configuration;
 
 public class FileServiceConfiguration
 {
-    public IServiceCollection Services { get; }
-
     public FileServiceConfiguration(IServiceCollection services)
     {
         Services = services ?? throw new ArgumentNullException(nameof(services));
     }
+
+    public IServiceCollection Services { get; }
 
     public FileServiceConfiguration UseRepository<TRepository>() where TRepository : class, IFileMetaRepository
     {

@@ -5,5 +5,5 @@ namespace MongoFileMetaRepository.Model;
 public abstract class BaseEntity
 {
     [BsonId]
-    public string Id { get; set; }
+    public string Id { get; set; } = null!;
 }

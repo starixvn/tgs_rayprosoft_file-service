@@ -6,24 +6,17 @@ namespace FileService.Controllers;
 
 [Route("api/fs")]
 [ApiController]
-public class FileManagementController : ControllerBase
+public class FileManagementController(IFileManager<IPrivateAmazonS3> fileManager) : ControllerBase
 {
-    private readonly IFileManager<IPrivateAmazonS3> _fileManager;
-
-    public FileManagementController(IFileManager<IPrivateAmazonS3> fileManager)
-    {
-        _fileManager = fileManager ?? throw new ArgumentNullException(nameof(fileManager));
-    }
-
     [HttpGet("{*path}")]
     public async Task<IActionResult> GetFileAsync(
-        string path)
+        string? path)
     {
-        var meta = await _fileManager.ListPathAsync(path)
+        var meta = await fileManager.ListPathAsync(path)
             .FirstAsync()
             .ConfigureAwait(false);
 
-        var fileStream = await _fileManager.OpenFileStreamAsync(meta).ConfigureAwait(false);
+        var fileStream = await fileManager.OpenFileStreamAsync(meta).ConfigureAwait(false);
 
         return File(fileStream, meta.ContentType);
     }
@@ -31,16 +24,16 @@ public class FileManagementController : ControllerBase
     [HttpGet("~/api/meta/{objectId}")]
     public async Task<FileViewModel> GetFileMetaAsync(string objectId)
     {
-        var meta = await _fileManager.GetFileMetaByObjectIdAsync(objectId).ConfigureAwait(false);
+        var meta = await fileManager.GetFileMetaByObjectIdAsync(objectId).ConfigureAwait(false);
 
         return new()
         {
-            Id = meta.Id,
+            Id = meta.Id!,
             FileName = meta.FileName,
             ContentType = meta.ContentType,
             FileLength = meta.FileLength,
             CreatedOn = meta.CreatedOn,
-            ExternalUrl = meta.ExternalUrl
+            ExternalUrl = meta.ExternalUrl!
         };
     }
 
@@ -49,18 +42,18 @@ public class FileManagementController : ControllerBase
         string path,
         [FromForm(Name = "file")] IFormFile file)
     {
-        var meta = await _fileManager
+        var meta = await fileManager
             .SaveAsync(path, file.ContentType, file.Length, file.OpenReadStream())
             .ConfigureAwait(false);
 
         return new()
         {
-            Id = meta.Id,
+            Id = meta.Id!,
             FileName = meta.FileName,
             ContentType = meta.ContentType,
             FileLength = meta.FileLength,
             CreatedOn = meta.CreatedOn,
-            ExternalUrl = meta.ExternalUrl
+            ExternalUrl = meta.ExternalUrl!
         };
     }
 }

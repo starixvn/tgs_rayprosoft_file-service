@@ -36,9 +36,9 @@ internal class MongoFileMetaRepository : IFileMetaRepository
 
     public ValueTask<FileMeta> FindByIdAsync(string objectId)
     {
-        var row = _mongoContext.GetQueries()
-            .Where(file => file.Id == objectId)
-            .Single();
+        var row = _mongoContext
+            .GetQueries()
+            .Single(file => file.Id == objectId);
 
         return ValueTask.FromResult(new FileMeta
         {
@@ -72,7 +72,7 @@ internal class MongoFileMetaRepository : IFileMetaRepository
         return result.ToAsyncEnumerable();
     }
 
-    public IAsyncEnumerable<FileMeta> ListFileMetasAsync(string prefix)
+    public IAsyncEnumerable<FileMeta> ListFileMetasAsync(string? prefix)
     {
         var query = _mongoContext.GetQueries().AsQueryable();
 

@@ -6,7 +6,7 @@ public interface IFileMetaRepository
 
     IAsyncEnumerable<FileMeta> ListExpiredFileMetasAsync(string prefix, DateTimeOffset expireTime);
 
-    IAsyncEnumerable<FileMeta> ListFileMetasAsync(string prefix);
+    IAsyncEnumerable<FileMeta> ListFileMetasAsync(string? prefix);
 
     ValueTask DeleteFileMetaByIdsAsync(IEnumerable<string> fileIds);
 

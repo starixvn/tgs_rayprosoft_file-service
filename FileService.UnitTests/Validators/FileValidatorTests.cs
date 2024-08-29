@@ -8,7 +8,7 @@ using FluentValidation.TestHelper;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using File = TGS.Apis.FileService.Resources.File;
+using File = FileService.Resources.File;
 
 namespace FileService.UnitTests.Validators;
 
@@ -25,7 +25,7 @@ public class FileValidatorTests : BaseTests
     }
 
     private readonly Mock<IOptions<FileSettings>> _settingsMock = new();
-    private FileValidator _validator;
+    private FileValidator? _validator;
 
     [Test]
     public void Should_have_error_when_file_size_greater_2MB()

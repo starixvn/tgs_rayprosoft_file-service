@@ -12,9 +12,6 @@ public sealed class MongoContext<T> : IMongoContext<T> where T : BaseEntity
     private readonly IMongoDatabase _database;
     private readonly IMongoClient _mongoClient;
 
-    private IMongoCollection<T> Collection =>
-        _database.GetCollection<T>(typeof(T).Name);
-
     public MongoContext(
         IOptions<FileMetaOptions> optionsAccessor,
         IMongoClient mongoClient,
@@ -35,12 +32,15 @@ public sealed class MongoContext<T> : IMongoContext<T> where T : BaseEntity
         }
     }
 
+    private IMongoCollection<T> Collection =>
+        _database.GetCollection<T>(typeof(T).Name);
+
     Task IMongoContext<T>.InsertAsync(T obj) => Collection.InsertOneAsync(_clientSessionHandle, obj);
 
     Task IMongoContext<T>.UpdateAsync(T obj)
     {
         Expression<Func<T, string>> func = f => f.Id;
-        var value = (string)obj.GetType().GetProperty(func.Body.ToString().Split(".")[1])?.GetValue(obj, null);
+        var value = (string)obj.GetType().GetProperty(func.Body.ToString().Split(".")[1])?.GetValue(obj, null)!;
         var filter = Builders<T>.Filter.Eq(func, value);
 
         return Collection.ReplaceOneAsync(_clientSessionHandle, filter, obj);
