@@ -72,7 +72,7 @@ public class FileValidatorTests : BaseTests
         result.ShouldNotHaveValidationErrorFor(request => request.File);
     }
 
-    private Fixture Customize<T>(Func<ICustomizationComposer<T>, ISpecimenBuilder> composerTransformation)
+    private static Fixture Customize<T>(Func<ICustomizationComposer<T>, ISpecimenBuilder> composerTransformation)
         where T : new()
     {
         var fixture = new Fixture();
