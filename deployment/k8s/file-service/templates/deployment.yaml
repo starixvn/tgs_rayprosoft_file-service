@@ -120,14 +120,13 @@ spec:
           livenessProbe:
             httpGet:
               path: /fs/health
-              port: 80
-            initialDelaySeconds: 10
+              port: http
             periodSeconds: 5
           readinessProbe:
             httpGet:
               path: /fs/health
-              port: 80
-            initialDelaySeconds: 5
+              port: http
+            periodSeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       volumes:
