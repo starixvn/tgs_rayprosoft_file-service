@@ -21,7 +21,7 @@ namespace FileService.Controllers
         [HttpPost("{*path}")]
         public async Task<FileViewModel> UploadFileAsync(
             string path,
-            [FromForm(Name = "file")] IFormFile file)
+            IFormFile file)
         {
             var meta = await _fileManager
                 .SaveAsync(path, file.ContentType, file.Length, file.OpenReadStream())

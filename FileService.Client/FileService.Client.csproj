@@ -5,12 +5,12 @@
     <RootNamespace>Tgs.FileService.Clients</RootNamespace>
     <AssemblyName>FileService.Client</AssemblyName>
     <PackageId>Tgs.FileService.Client</PackageId>
-    <Version>0.0.4</Version>
+    <Version>0.0.10</Version>
     <Authors>Raypro</Authors>
     <Product>Tgs.FileService.Client</Product>
     <Description>FileService Client</Description>
-    <PackageProjectUrl>https://gitlab.com/rayprosoft/file-service</PackageProjectUrl>
-    <RepositoryUrl>https://gitlab.com/rayprosoft/file-service.git</RepositoryUrl>
+    <PackageProjectUrl>https://git3.nexdev.net/tgs/rayprosoft/file-service</PackageProjectUrl>
+    <RepositoryUrl>https://git3.nexdev.net/tgs/rayprosoft/file-service.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>TGS Raypro</PackageTags>
     <IsPackable>true</IsPackable>

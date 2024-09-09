@@ -27,9 +27,9 @@ namespace FileService.Controllers
                 .FirstAsync()
                 .ConfigureAwait(false);
 
-            // todo var fileStream = await _fileManager.OpenFileStreamAsync(meta).ConfigureAwait(false);
+            var fileStream = await _fileManager.OpenFileStreamAsync(meta).ConfigureAwait(false);
 
-            return File(meta.InputStream, meta.ContentType);
+            return File(fileStream, meta.ContentType);
         }
 
         [HttpGet("~/api/meta/{objectId}")]

@@ -9,7 +9,7 @@ namespace FileService.Core
     {
         Task<FileMeta> GetFileMetaByObjectIdAsync(string objectId);
 
-        //todo Task<Stream> OpenFileStreamAsync(FileMeta meta);
+        Task<Stream> OpenFileStreamAsync(FileMeta meta);
 
         Task<FileMeta> SaveAsync(string filePath, string contentType, long contentLength, Stream fileStream);
 
@@ -19,4 +19,5 @@ namespace FileService.Core
 
         IAsyncEnumerable<FileMeta> FindExpiredFilesAsync(string prefix, DateTimeOffset expireTime);
     }
+
 }

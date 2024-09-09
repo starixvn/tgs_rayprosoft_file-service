@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FileService.Core;
 using MongoDB.Bson;
-using File = MongoFileMetaRepository.Model.File;
+using MongoFileMetaRepository.Model;
 
 namespace MongoFileMetaRepository
 {
@@ -26,10 +25,8 @@ namespace MongoFileMetaRepository
                 FileName = meta.FileName,
                 ContentType = meta.ContentType,
                 FileLength = meta.FileLength,
-                CreatedOn = DateTimeOffset.Now,
-                InputStream = ConvertStreamToByteArray(meta.InputStream)
+                CreatedOn = DateTimeOffset.Now
             };
-
 
             await _mongoContext
                 .InsertAsync(file)
@@ -53,8 +50,7 @@ namespace MongoFileMetaRepository
                 FileName = row.FileName,
                 ContentType = row.ContentType,
                 FileLength = row.FileLength,
-                CreatedOn = row.CreatedOn,
-                InputStream = new MemoryStream(row.InputStream)
+                CreatedOn = row.CreatedOn
             });
         }
 
@@ -72,8 +68,7 @@ namespace MongoFileMetaRepository
                     FileName = row.FileName,
                     ContentType = row.ContentType,
                     FileLength = row.FileLength,
-                    CreatedOn = row.CreatedOn,
-                    InputStream = new MemoryStream(row.InputStream)
+                    CreatedOn = row.CreatedOn
                 });
 
             return result.ToAsyncEnumerable();
@@ -93,20 +88,10 @@ namespace MongoFileMetaRepository
                     FileName = row.FileName,
                     ContentType = row.ContentType,
                     FileLength = row.FileLength,
-                    CreatedOn = row.CreatedOn,
-                    InputStream = new MemoryStream(row.InputStream)
+                    CreatedOn = row.CreatedOn
                 });
 
             return result.ToAsyncEnumerable();
-        }
-
-        public byte[] ConvertStreamToByteArray(Stream inputStream)
-        {
-            using (MemoryStream ms = new MemoryStream())
-            {
-                inputStream.CopyTo(ms);
-                return ms.ToArray();
-            }
         }
     }
 }
