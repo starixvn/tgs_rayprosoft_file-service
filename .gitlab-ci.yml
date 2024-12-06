@@ -89,7 +89,7 @@ deploy-staging:
     - deploy_k8s $TgsSettingKey $HelmTemplateFolderName $namespace
 
 deploy-prod:
-  extends: .deploy-template
+  extends: .deploy-k8s-template
   variables:
     namespace: prod
     replica: 2
