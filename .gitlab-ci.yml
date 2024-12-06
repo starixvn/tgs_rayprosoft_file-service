@@ -45,7 +45,9 @@ deploy-dev:
   extends: .deploy-template
   variables:
     namespace: dev
-    kube_config: KubeConfig_Raypro_dev
+    replica: 1
+    DedicatedKey: dedicated
+    NodeSelectorKey: node-selector
   environment:
     name: service-dev
   stage: deploy-dev
@@ -60,10 +62,12 @@ deploy-dev:
     - deploy_k8s $TgsSettingKey $HelmTemplateFolderName $namespace
 
 deploy-staging:
-  extends: .deploy-template
+  extends: .deploy-k8s-template
   variables:
     namespace: staging
-    kube_config: KubeConfig_Raypro_staging
+    replica: 1
+    DedicatedKey: dedicated
+    NodeSelectorKey: node-selector
   environment:
     name: service-staging
   stage: deploy-staging
@@ -80,7 +84,9 @@ deploy-prod:
   extends: .deploy-template
   variables:
     namespace: prod
-    kube_config: KubeConfig_Raypro_prod
+    replica: 2
+    DedicatedKey: dedicated
+    NodeSelectorKey: node-selector
   environment:
     name: service-prod
   stage: deploy-prod
