@@ -42,7 +42,7 @@ push-k8s-template:
     - push_k8s_template $HelmTemplateFolderName $ImageName $Tag
 
 deploy-dev:
-  extends: .deploy-template
+  extends: .deploy-k8s-template
   variables:
     namespace: dev
     replica: 1
