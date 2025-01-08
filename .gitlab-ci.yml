@@ -92,7 +92,7 @@ deploy-prod:
   extends: .deploy-k8s-template
   variables:
     namespace: prod
-    replica: 1
+    replica: 2
     DedicatedKey: dedicated
     NodeSelectorKey: node-selector
   environment:
